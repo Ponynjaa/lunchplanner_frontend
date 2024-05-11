@@ -1,0 +1,109 @@
+.home-page-container {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+
+.header {
+	display: flex;
+	width: 100%;
+	align-items: center;
+	gap: 1rem;
+	position: relative;
+	z-index: 100;
+	background-color: #101112;
+
+	.logo {
+		height: 70px;
+		width: auto;
+	}
+
+	.user-container {
+		display: flex;
+	}
+}
+
+.search-container {
+	flex-grow: 1;
+	margin: 0 10px;
+
+	input {
+		width: 100%;
+		padding: 5px;
+		font-size: 16px;
+		border: 1px solid #ccc;
+		border-radius: 5px;
+	}
+}
+
+mat-list-item {
+	padding-top: 10px;
+	padding-bottom: 10px;
+	height: 100% !important;
+	background-color: #181a1b;
+	margin-bottom: 10px;
+	border-radius: 10px;
+
+	.restaurant {
+		display: flex;
+		flex-direction: row;
+		align-items: center;
+
+		.restaurant-logo {
+			border-radius: 10px;
+			height: 80px;
+			width: auto;
+			margin-right: 30px;
+		}
+
+		.restaurant-info-container {
+			.restaurant-name {
+				font-weight: 500;
+				margin-bottom: 0;
+			}
+
+			.restaurant-street {
+				color: #a29a8e;
+				margin-bottom: 0;
+			}
+
+			.restaurant-city {
+				margin-top: -5px;
+				color: #a29a8e;
+			}
+		}
+
+		.restaurant-vote-container {
+			display: flex;
+			flex-direction: column;
+			margin-left: 30px;
+
+			.restaurant-upvote-button,
+			.restaurant-downvote-button {
+				position: relative;
+				background-color: inherit;
+				border-color: transparent;
+				border-radius: 50%;
+				color: inherit;
+				cursor: pointer;
+				transition-duration: 0.4s;
+
+				mat-icon {
+					padding: 7px;
+				}
+
+				:hover {
+					background-color: #2c272b;
+					transition: background-color 0.1s;
+					border-radius: 50%;
+				}
+
+				:active {
+					background-color: #342f32;
+					border-radius: 50%;
+					transition: background-color cubic-bezier(0.68, -0.55, 0.265, 1.55);
+				}
+			}
+		}
+	}
+}

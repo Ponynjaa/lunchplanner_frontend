@@ -1,3 +1,8 @@
 import { Routes } from '@angular/router';
+import { HomepageComponent } from './homepage/homepage.component';
+import { AuthGuard } from './guard/auth.guard';
 
-export const routes: Routes = [];
+export const routes: Routes = [
+	{ path: '', component: HomepageComponent, canActivate: [AuthGuard] },
+	{ path: '**', redirectTo: '' },
+];

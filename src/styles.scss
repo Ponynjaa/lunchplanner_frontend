@@ -1,1 +1,40 @@
 /* You can add global styles to this file, and also import other style files */
+@font-face {
+	font-family: 'gg sans';
+	font-style: normal;
+	font-weight: normal;
+	src: url('./assets/fonts/gg\ sans\ Regular.woff') format('woff');
+}
+
+@font-face {
+	font-family: 'gg sans';
+	font-style: normal;
+	font-weight: 500;
+	src: url('./assets/fonts/gg\ sans\ Medium.woff') format('woff');
+}
+
+@font-face {
+	font-family: 'gg sans';
+	font-style: normal;
+	font-weight: 600;
+	src: url('./assets/fonts/gg\ sans\ Semibold.woff') format('woff');
+}
+
+@font-face {
+	font-family: 'gg sans';
+	font-style: normal;
+	font-weight: bold;
+	src: url('./assets/fonts/gg\ sans\ Bold.woff') format('woff');
+}
+
+html {
+	background-color: #1a1c1d;
+	color: #e8e6e3;
+	font-family: 'gg sans';
+}
+
+html, body {
+	height: 100%;
+	margin: 0;
+}
+// body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }

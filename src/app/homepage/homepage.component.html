@@ -1,0 +1,38 @@
+<div class="home-page-container">
+	<div class="header">
+		<img class="logo" src="../../assets/lunchplanner_logo.png" alt="Logo" />
+		<div class="search-container">
+			<input type="text" [(ngModel)]="searchText" placeholder="Search restaurants..."
+				(keyup)="onSearchChange($event)" />
+		</div>
+
+		<button mat-button [matMenuTriggerFor]="userMenu">
+			<div class="user-container">
+				<span class="user-full-name">{{ userProfile?.firstName }} {{ userProfile?.lastName }}</span>
+				<mat-icon fontIcon="expand_more"></mat-icon>
+			</div>
+		</button>
+		<mat-menu #userMenu="matMenu" xPosition="before">
+			<button mat-menu-item (click)="logout()"><mat-icon>logout</mat-icon> Logout</button>
+		</mat-menu>
+	</div>
+
+	<mat-list>
+		@for (restaurant of filteredRestaurants; track restaurant) {
+		<mat-list-item>
+			<div class="restaurant">
+				<img class="restaurant-logo" [src]="restaurant.logourl" alt="{{ restaurant.name }}">
+				<div class="restaurant-info-container">
+					<h3 class="restaurant-name">{{restaurant.name}}</h3>
+					<p class="restaurant-street">{{restaurant.street}}</p>
+					<p class="restaurant-city">{{restaurant.city}}</p>
+				</div>
+				<div class="restaurant-vote-container">
+					<button class="restaurant-upvote-button"><mat-icon>keyboard_arrow_up</mat-icon></button>
+					<button class="restaurant-downvote-button"><mat-icon>keyboard_arrow_down</mat-icon></button>
+				</div>
+			</div>
+		</mat-list-item>
+		}
+	</mat-list>
+</div>
