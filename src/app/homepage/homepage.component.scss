@@ -18,6 +18,10 @@
 		width: auto;
 	}
 
+	.user-dropdown {
+		margin-left: auto;
+	}
+
 	.user-container {
 		display: flex;
 	}
@@ -33,6 +37,31 @@
 		font-size: 16px;
 		border: 1px solid #ccc;
 		border-radius: 5px;
+	}
+}
+
+.drawer-container {
+	display: flex;
+	flex-direction: row;
+	width: 100%;
+	margin-top: 20px;
+
+	.drawer {
+		margin-left: 20px;
+	}
+
+	.drawer-content {
+		width: fit-content;
+		margin-left: auto;
+		margin-right: auto;
+	}
+}
+
+.subkitchens {
+	margin-top: 0;
+
+	li {
+		list-style-type: none;
 	}
 }
 
@@ -63,12 +92,16 @@ mat-list-item {
 			}
 
 			.restaurant-street {
-				color: #a29a8e;
 				margin-bottom: 0;
 			}
 
 			.restaurant-city {
 				margin-top: -5px;
+			}
+
+			.restaurant-city,
+			.restaurant-street,
+			.restaurant-subkitchens {
 				color: #a29a8e;
 			}
 		}
@@ -76,7 +109,7 @@ mat-list-item {
 		.restaurant-vote-container {
 			display: flex;
 			flex-direction: column;
-			margin-left: 30px;
+			margin-left: auto;
 
 			.restaurant-upvote-button,
 			.restaurant-downvote-button {

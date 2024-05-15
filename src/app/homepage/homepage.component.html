@@ -1,12 +1,8 @@
 <div class="home-page-container">
 	<div class="header">
 		<img class="logo" src="../../assets/lunchplanner_logo.png" alt="Logo" />
-		<div class="search-container">
-			<input type="text" [(ngModel)]="searchText" placeholder="Search restaurants..."
-				(keyup)="onSearchChange($event)" />
-		</div>
 
-		<button mat-button [matMenuTriggerFor]="userMenu">
+		<button mat-button [matMenuTriggerFor]="userMenu" class="user-dropdown">
 			<div class="user-container">
 				<span class="user-full-name">{{ userProfile?.firstName }} {{ userProfile?.lastName }}</span>
 				<mat-icon fontIcon="expand_more"></mat-icon>
@@ -17,22 +13,49 @@
 		</mat-menu>
 	</div>
 
-	<mat-list>
-		@for (restaurant of filteredRestaurants; track restaurant) {
-		<mat-list-item>
-			<div class="restaurant">
-				<img class="restaurant-logo" [src]="restaurant.logourl" alt="{{ restaurant.name }}">
-				<div class="restaurant-info-container">
-					<h3 class="restaurant-name">{{restaurant.name}}</h3>
-					<p class="restaurant-street">{{restaurant.street}}</p>
-					<p class="restaurant-city">{{restaurant.city}}</p>
-				</div>
-				<div class="restaurant-vote-container">
-					<button class="restaurant-upvote-button"><mat-icon>keyboard_arrow_up</mat-icon></button>
-					<button class="restaurant-downvote-button"><mat-icon>keyboard_arrow_down</mat-icon></button>
-				</div>
+	<div class="drawer-container">
+		<div class="drawer">
+			<div class="search-container">
+				<input type="text" [(ngModel)]="searchText" placeholder="Search restaurants..."
+					(keyup)="onSearchChange($event)" />
 			</div>
-		</mat-list-item>
-		}
-	</mat-list>
+			<div class="kitchens">
+				@for (kitchen of kitchens; track kitchen) {
+					<mat-checkbox class="kitchen-checkbox">
+						{{ kitchen.description }}
+					</mat-checkbox>
+					<ul class="subkitchens">
+						@for (subkitchen of kitchen.subkitchens; track subkitchen) {
+							<li>
+								<mat-checkbox>
+									{{ subkitchen }}
+								</mat-checkbox>
+							</li>
+						}
+					</ul>
+				}
+			</div>
+		</div>
+		<div class="drawer-content">
+			<mat-list>
+				@for (restaurant of filteredRestaurants; track restaurant) {
+					<mat-list-item>
+						<div class="restaurant" id="{{ restaurant.id }}">
+							<img class="restaurant-logo" [src]="restaurant.logourl" alt="{{ restaurant.name }}">
+							<div class="restaurant-info-container">
+								<h3 class="restaurant-name">{{ restaurant.name }}</h3>
+								<p class="restaurant-street">{{ restaurant.street }}</p>
+								<p class="restaurant-city">{{ restaurant.city }}</p>
+								<p class="restaurant-subkitchens">{{ restaurant.subkitchens.join(', ') }}</p>
+							</div>
+							<div class="restaurant-vote-container">
+								<button class="restaurant-upvote-button"><mat-icon>keyboard_arrow_up</mat-icon></button>
+								<button class="restaurant-downvote-button"><mat-icon>keyboard_arrow_down</mat-icon></button>
+							</div>
+						</div>
+					</mat-list-item>
+				}
+			</mat-list>
+		</div>
+	</div>
 </div>

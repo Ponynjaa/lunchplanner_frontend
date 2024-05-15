@@ -2,18 +2,19 @@ import { Component, OnInit } from '@angular/core';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatListModule } from '@angular/material/list';
 import { RestaurantService } from '../services/restaurant.service';
-import { Restaurant } from '../models/restaurant';
+import { Kitchen, Restaurant } from '../models/restaurant';
 import { KeycloakOperationService } from '../services/keycloak.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 
 @Component({
 	selector: 'app-homepage',
 	standalone: true,
-	imports: [MatSnackBarModule, CommonModule, FormsModule, MatListModule, MatButtonModule, MatMenuModule, MatIconModule],
+	imports: [MatSnackBarModule, CommonModule, FormsModule, MatListModule, MatButtonModule, MatMenuModule, MatIconModule, MatCheckboxModule],
 	templateUrl: './homepage.component.html',
 	styleUrl: './homepage.component.scss'
 })
@@ -23,6 +24,7 @@ export class HomepageComponent implements OnInit {
 	searchText: string = '';
 	userProfile: any | null = null;
 	isTooltipVisible = false;
+	kitchens: Kitchen[] = [];
 
 	constructor(
 		private restaurantService: RestaurantService,
@@ -32,6 +34,7 @@ export class HomepageComponent implements OnInit {
 
 	ngOnInit(): void {
 		this.getAllRestaurants();
+		this.getCurrentlyUsedKitchens();
 		this.keyCloakService.getUserProfile().then((data: any) => {
 			this.userProfile = data;
 			console.log(this.userProfile);
@@ -40,6 +43,17 @@ export class HomepageComponent implements OnInit {
 
 	logout() {
 		this.keyCloakService.logout();
+	}
+
+	getCurrentlyUsedKitchens() {
+		this.restaurantService.getCurrentlyUsedKitchens().subscribe({
+			next: (kitchens: Kitchen[]) => {
+				this.kitchens = kitchens;
+			},
+			error: (error: any) => {
+				this.handleError(error.error);
+			}
+		});
 	}
 
 	getAllRestaurants() {
