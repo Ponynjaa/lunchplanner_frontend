@@ -16,24 +16,35 @@
 	<div class="drawer-container">
 		<div class="drawer">
 			<div class="search-container">
+				<mat-icon fontIcon="search"></mat-icon>
 				<input type="text" [(ngModel)]="searchText" placeholder="Search restaurants..."
-					(keyup)="onSearchChange($event)" />
+				(keyup)="onSearchChange($event)" />
 			</div>
 			<div class="kitchens">
-				@for (kitchen of kitchens; track kitchen) {
-					<mat-checkbox class="kitchen-checkbox">
-						{{ kitchen.description }}
-					</mat-checkbox>
-					<ul class="subkitchens">
-						@for (subkitchen of kitchen.subkitchens; track subkitchen) {
-							<li>
-								<mat-checkbox>
-									{{ subkitchen }}
+				<mat-accordion multi>
+					@for (kitchen of kitchens; track kitchen) {
+						<mat-expansion-panel>
+							<mat-expansion-panel-header>
+								<mat-checkbox class="kitchen-checkbox"
+									[checked]="kitchenFilter[kitchen.id].checked"
+									[indeterminate]="someChecked(kitchen.id)"
+									(change)="setAll(kitchen.id, $event.checked)"
+									(click)="$event.stopPropagation()">
+									{{ kitchen.description }}
 								</mat-checkbox>
-							</li>
-						}
-					</ul>
-				}
+							</mat-expansion-panel-header>
+							<ul class="subkitchens">
+								@for (subkitchen of kitchen.subkitchens; track subkitchen) {
+									<li>
+										<mat-checkbox [(ngModel)]="kitchenFilter[kitchen.id].subkitchens[subkitchen.id].checked" (ngModelChange)="updateAllComplete(kitchen.id)">
+											{{ subkitchen.description }}
+										</mat-checkbox>
+									</li>
+								}
+							</ul>
+						</mat-expansion-panel>
+					}
+				</mat-accordion>
 			</div>
 		</div>
 		<div class="drawer-content">

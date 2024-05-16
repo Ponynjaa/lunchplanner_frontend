@@ -11,7 +11,7 @@
 	gap: 1rem;
 	position: relative;
 	z-index: 100;
-	background-color: #101112;
+	border-bottom: 1px solid #2d2626;
 
 	.logo {
 		height: 70px;
@@ -28,15 +28,30 @@
 }
 
 .search-container {
-	flex-grow: 1;
-	margin: 0 10px;
+	width: 100%;
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+	gap: 10px;
+	border: 1px solid #2d2626;
+	border-radius: 5px;
+	padding: 10px;
+	box-sizing: border-box;
+	margin-bottom: 10px;
 
 	input {
 		width: 100%;
 		padding: 5px;
 		font-size: 16px;
-		border: 1px solid #ccc;
-		border-radius: 5px;
+		border: none;
+		background-color: inherit;
+		color: inherit;
+
+		&:active,
+		&:focus,
+		&:focus-visible {
+			outline: none;
+		}
 	}
 }
 
@@ -44,11 +59,9 @@
 	display: flex;
 	flex-direction: row;
 	width: 100%;
-	margin-top: 20px;
-
-	.drawer {
-		margin-left: 20px;
-	}
+	margin: 30px 0;
+	padding-left: 30px;
+	box-sizing: border-box;
 
 	.drawer-content {
 		width: fit-content;
@@ -63,6 +76,15 @@
 	li {
 		list-style-type: none;
 	}
+}
+
+mat-expansion-panel {
+	background-color: #181a1b;
+	user-select: none;
+}
+
+mat-list {
+	padding: unset;
 }
 
 mat-list-item {

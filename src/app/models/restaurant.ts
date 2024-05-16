@@ -8,6 +8,7 @@ export interface Restaurant {
 }
 
 export interface Kitchen {
+	id: number;
 	description: string;
-	subkitchens: string[];
+	subkitchens: Kitchen[];
 }
