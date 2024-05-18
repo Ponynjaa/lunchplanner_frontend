@@ -63,6 +63,11 @@
 	padding-left: 30px;
 	box-sizing: border-box;
 
+	.drawer {
+		max-height: calc(100vh - 110px);
+		overflow: auto;
+	}
+
 	.drawer-content {
 		width: fit-content;
 		margin-left: auto;

@@ -36,7 +36,7 @@
 							<ul class="subkitchens">
 								@for (subkitchen of kitchen.subkitchens; track subkitchen) {
 									<li>
-										<mat-checkbox [(ngModel)]="kitchenFilter[kitchen.id].subkitchens[subkitchen.id].checked" (ngModelChange)="updateAllComplete(kitchen.id)">
+										<mat-checkbox [(ngModel)]="kitchenFilter[kitchen.id].subkitchens[subkitchen.id].checked" (ngModelChange)="updateAllComplete(kitchen.id, subkitchen.id)">
 											{{ subkitchen.description }}
 										</mat-checkbox>
 									</li>
@@ -57,7 +57,7 @@
 								<h3 class="restaurant-name">{{ restaurant.name }}</h3>
 								<p class="restaurant-street">{{ restaurant.street }}</p>
 								<p class="restaurant-city">{{ restaurant.city }}</p>
-								<p class="restaurant-subkitchens">{{ restaurant.subkitchens.join(', ') }}</p>
+								<p class="restaurant-subkitchens">{{ getSubkitchenDescriptions(restaurant.subkitchens) }}</p>
 							</div>
 							<div class="restaurant-vote-container">
 								<button class="restaurant-upvote-button"><mat-icon>keyboard_arrow_up</mat-icon></button>

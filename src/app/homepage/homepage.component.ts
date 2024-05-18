@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatListModule } from '@angular/material/list';
 import { RestaurantService } from '../services/restaurant.service';
-import { Kitchen, Restaurant } from '../models/restaurant';
+import { Kitchen, Restaurant, SubKitchen } from '../models/restaurant';
 import { KeycloakOperationService } from '../services/keycloak.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -47,8 +47,53 @@ export class HomepageComponent implements OnInit {
 		this.keyCloakService.logout();
 	}
 
-	updateAllComplete(kitchenId: number) {
+	getSubkitchenDescriptions(subkitchens: SubKitchen[]): string {
+		return subkitchens.map(sk => sk.description).join(', ')
+	}
+
+	updateAllComplete(kitchenId: number, subkitchenId: number) {
 		this.kitchenFilter[kitchenId].checked = Object.values(this.kitchenFilter[kitchenId].subkitchens).every((subkitchen: any) => subkitchen.checked);
+
+		this.updateSubkitchenRestaurantFilter(kitchenId, subkitchenId);
+	}
+
+	updateSubkitchenRestaurantFilter(kitchenId: number, subkitchenId?: number) {
+		const kitchen = this.kitchenFilter[kitchenId];
+		const subkitchenIds = subkitchenId ? [subkitchenId] : Object.keys(kitchen.subkitchens);
+
+		for (const subkitchenId of subkitchenIds) {
+			const checked = kitchen.subkitchens[subkitchenId].checked;
+
+			if (checked) {
+				const restaurantsToAdd = this.restaurants.filter((restaurant) => {
+					return restaurant.subkitchens.find(sk => sk.id == subkitchenId);
+				});
+
+				for (const restaurantToAdd of restaurantsToAdd) {
+					if (!this.filteredRestaurants.includes(restaurantToAdd)) {
+						this.filteredRestaurants.push(restaurantToAdd);
+					}
+				}
+			} else {
+				const allSubKitchens = Object.values(this.kitchenFilter).map((k: any) => k.subkitchens).reduce((prev, curr) => {
+					return {
+						...prev,
+						...curr
+					};
+				}, {});
+				console.log(allSubKitchens);
+
+				this.filteredRestaurants = this.filteredRestaurants.filter((restaurant) => {
+					return !restaurant.subkitchens.every(sk => {
+						return !allSubKitchens[sk.id].checked;
+					});
+				});
+			}
+		}
+
+		// TODO: combine with search
+
+		this.filteredRestaurants.sort((a, b) => a.name.localeCompare(b.name));
 	}
 
 	someChecked(kitchenId: number): boolean {
@@ -60,6 +105,8 @@ export class HomepageComponent implements OnInit {
 		for (const subkitchen in this.kitchenFilter[kitchenId].subkitchens) {
 			this.kitchenFilter[kitchenId].subkitchens[subkitchen].checked = checked;
 		}
+
+		this.updateSubkitchenRestaurantFilter(kitchenId);
 	}
 
 	getCurrentlyUsedKitchens() {
@@ -127,5 +174,7 @@ export class HomepageComponent implements OnInit {
 				|| restaurant.street.toLowerCase().includes(searchText)
 				|| restaurant.subkitchens.join(' ').toLowerCase().includes(searchText);
 		});
+
+		this.filteredRestaurants.sort((a, b) => a.name.localeCompare(b.name));
 	}
 }

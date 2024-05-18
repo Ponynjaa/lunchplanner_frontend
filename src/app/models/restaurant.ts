@@ -4,11 +4,16 @@ export interface Restaurant {
 	logourl: string;
 	city: string;
 	street: string;
-	subkitchens: string[];
+	subkitchens: SubKitchen[];
 }
 
 export interface Kitchen {
 	id: number;
 	description: string;
-	subkitchens: Kitchen[];
+	subkitchens: SubKitchen[];
+}
+
+export interface SubKitchen {
+	id: number;
+	description: string;
 }
