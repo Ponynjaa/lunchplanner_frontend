@@ -1,17 +1,5 @@
 <div class="home-page-container">
-	<div class="header">
-		<img class="logo" src="../../assets/lunchplanner_logo.png" alt="Logo" />
-
-		<button mat-button [matMenuTriggerFor]="userMenu" class="user-dropdown">
-			<div class="user-container">
-				<span class="user-full-name">{{ userProfile?.firstName }} {{ userProfile?.lastName }}</span>
-				<mat-icon fontIcon="expand_more"></mat-icon>
-			</div>
-		</button>
-		<mat-menu #userMenu="matMenu" xPosition="before">
-			<button mat-menu-item (click)="logout()"><mat-icon>logout</mat-icon> Logout</button>
-		</mat-menu>
-	</div>
+	<app-header></app-header>
 
 	<div class="drawer-container">
 		<div class="drawer">
@@ -48,6 +36,7 @@
 			</div>
 		</div>
 		<div class="drawer-content">
+			<div class="restaurant-count">Wähle aus {{ filteredRestaurants.length }} Restaurants</div>
 			<mat-list>
 				@for (restaurant of filteredRestaurants; track restaurant) {
 					<mat-list-item>

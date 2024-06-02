@@ -4,27 +4,8 @@
 	align-items: center;
 }
 
-.header {
-	display: flex;
+app-header {
 	width: 100%;
-	align-items: center;
-	gap: 1rem;
-	position: relative;
-	z-index: 100;
-	border-bottom: 1px solid #2d2626;
-
-	.logo {
-		height: 70px;
-		width: auto;
-	}
-
-	.user-dropdown {
-		margin-left: auto;
-	}
-
-	.user-container {
-		display: flex;
-	}
 }
 
 .search-container {
@@ -33,7 +14,7 @@
 	flex-direction: row;
 	align-items: center;
 	gap: 10px;
-	border: 1px solid #2d2626;
+	border: 1px solid var(--border-color);
 	border-radius: 5px;
 	padding: 10px;
 	box-sizing: border-box;
@@ -73,6 +54,13 @@
 		margin-left: auto;
 		margin-right: auto;
 	}
+
+	.restaurant-count {
+		text-align: center;
+		font-size: 20px;
+		font-weight: bold;
+		margin-bottom: 20px;
+	}
 }
 
 .subkitchens {
@@ -84,7 +72,7 @@
 }
 
 mat-expansion-panel {
-	background-color: #181a1b;
+	background-color: var(--foreground-color);
 	user-select: none;
 }
 
@@ -96,7 +84,7 @@ mat-list-item {
 	padding-top: 10px;
 	padding-bottom: 10px;
 	height: 100% !important;
-	background-color: #181a1b;
+	background-color: var(--foreground-color);
 	margin-bottom: 10px;
 	border-radius: 10px;
 
@@ -129,7 +117,7 @@ mat-list-item {
 			.restaurant-city,
 			.restaurant-street,
 			.restaurant-subkitchens {
-				color: #a29a8e;
+				color: var(--grey-text-color);
 			}
 		}
 

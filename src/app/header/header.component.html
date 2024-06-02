@@ -1,0 +1,20 @@
+<div class="header">
+	<img class="logo" src="../../assets/lunchplanner_logo.png" alt="Logo" routerLink="/"/>
+
+	<button mat-button routerLink="/add-restaurant">
+		<mat-icon fontIcon="add"></mat-icon>
+		<span>Add restaurant</span>
+	</button>
+
+	<button mat-button [matMenuTriggerFor]="userMenu" class="user-dropdown">
+		<div class="user-container">
+			<img [src]="userProfile?.userImage" alt="UserImage">
+			<span class="user-full-name">{{ userProfile?.firstName }} {{ userProfile?.lastName }}</span>
+			<mat-icon fontIcon="expand_more"></mat-icon>
+		</div>
+	</button>
+	<mat-menu #userMenu="matMenu" xPosition="before">
+		<button mat-menu-item (click)="openProfileDialog()"><mat-icon>account_circle</mat-icon> Manage account</button>
+		<button mat-menu-item (click)="logout()"><mat-icon>logout</mat-icon> Logout</button>
+	</mat-menu>
+</div>

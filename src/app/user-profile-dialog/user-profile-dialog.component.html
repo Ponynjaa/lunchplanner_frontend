@@ -1,0 +1,16 @@
+<h2 mat-dialog-title>Manage account</h2>
+<mat-dialog-content>
+	<div class="image-upload">
+		<div class="image-label">Profile picture</div>
+		<label for="userImage" #userImageLabel></label>
+		<input type="file" id="userImage" (change)="onFileSelected($event)" accept="image/*">
+	</div>
+	<mat-form-field appearance="outline">
+		<mat-label>Language</mat-label>
+		<input type="text" matInput [(ngModel)]="language" required>
+	</mat-form-field>
+</mat-dialog-content>
+<mat-dialog-actions>
+	<button mat-button (click)="saveChanges()">Save</button>
+	<button mat-button mat-dialog-close>Close</button>
+</mat-dialog-actions>

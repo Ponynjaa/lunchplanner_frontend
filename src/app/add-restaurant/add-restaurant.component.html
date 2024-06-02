@@ -1,0 +1,55 @@
+<div class="add-restaurant-container">
+	<app-header></app-header>
+
+	<div class="wrapper">
+		<form [formGroup]="restaurantForm" class="form">
+			<mat-form-field appearance="outline">
+				<mat-label>Name</mat-label>
+				<input type="text" matInput formControlName="name" required>
+			</mat-form-field>
+			<mat-form-field appearance="outline">
+				<mat-label>City</mat-label>
+				<input type="text" matInput formControlName="city" required>
+			</mat-form-field>
+			<mat-form-field appearance="outline">
+				<mat-label>Street</mat-label>
+				<input type="text" matInput formControlName="street" required>
+			</mat-form-field>
+			<mat-form-field appearance="outline">
+				<mat-label>Kitchens</mat-label>
+				<mat-chip-grid #subkitchenChips>
+					@for (subkitchen of restaurant.subkitchens; track subkitchen) {
+						<mat-chip-row (removed)="removeSubkitchen(subkitchen)">
+							{{ subkitchen.description }}
+							<button matChipRemove>
+								<mat-icon>cancel</mat-icon>
+							</button>
+						</mat-chip-row>
+					}
+				</mat-chip-grid>
+				<input #kitchenInput
+					matInput
+					required
+					type="text"
+					formControlName="kitchen"
+					[matChipInputFor]="subkitchenChips"
+					[matAutocomplete]="kitchenAutocomplete"
+					(input)="filterKitchens()"
+					(focus)="filterKitchens()">
+				<mat-autocomplete #kitchenAutocomplete="matAutocomplete" requireSelection autoActiveFirstOption [displayWith]="displayWith">
+					@for (kitchen of filteredKitchens; track kitchen) {
+						<mat-optgroup [label]="kitchen.description">
+							@for (subkitchen of kitchen.subkitchens; track subkitchen) {
+								<mat-option [value]="subkitchen">{{ subkitchen.description }}</mat-option>
+							}
+						</mat-optgroup>
+					}
+				</mat-autocomplete>
+			</mat-form-field>
+			<button type="submit" mat-stroked-button (click)="addRestaurant()">
+				<mat-icon fontIcon="add"></mat-icon>
+				<span>Add restaurant</span>
+			</button>
+		</form>
+	</div>
+</div>

@@ -27,14 +27,49 @@
 	src: url('./assets/fonts/gg\ sans\ Bold.woff') format('woff');
 }
 
+:root {
+	--border-color: #2d2626;
+	--foreground-color: #181a1b;
+	--grey-text-color: #a29a8e;
+}
+
 html {
 	background-color: #101112;
 	color: #e8e6e3;
 	font-family: 'gg sans';
 }
 
-html, body {
+html,
+body {
 	height: 100%;
 	margin: 0;
 }
-// body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
+
+.mat-mdc-snack-bar-container {
+	&.snackbar-success {
+		--mdc-snackbar-container-color: green;
+		--mat-mdc-snack-bar-button-color: #fff;
+		--mdc-snackbar-supporting-text-color: #fff;
+	}
+
+	&.snackbar-failure {
+		--mdc-snackbar-container-color: red;
+		--mat-mdc-snack-bar-button-color: #fff;
+		--mdc-snackbar-supporting-text-color: #fff;
+		--mat-snack-bar-button-color: #fff;
+	}
+}
+
+.snackbar-status simple-snack-bar::before {
+	font-family: 'Material Icons';
+	padding: 10px;
+	margin: auto 0;
+}
+
+.snackbar-success simple-snack-bar::before {
+	content: 'check';
+}
+
+.snackbar-failure simple-snack-bar::before {
+	content: 'error';
+}

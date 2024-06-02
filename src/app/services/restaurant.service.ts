@@ -8,18 +8,19 @@ import { Kitchen, Restaurant } from '../models/restaurant';
 })
 export class RestaurantService {
 	private readonly backendUrl = 'http://localhost:3000/api/v1';
+	// private readonly backendUrl = '/api/v1';
 	constructor(private http: HttpClient) { }
 
 	getAllRestaurants(): Observable<Array<Restaurant>> {
-		return this.http.get<Array<Restaurant>>(`${this.backendUrl}/getAllRestaurants`);
+		return this.http.get<Array<Restaurant>>(`${this.backendUrl}/restaurant/getAllRestaurants`);
 	}
 	getRestaurantById(id: number): Observable<Restaurant> {
-		return this.http.get<Restaurant>(`${this.backendUrl}/getRestaurantById/${id}`);
+		return this.http.get<Restaurant>(`${this.backendUrl}/restaurant/getRestaurantById?id=${id}`);
 	}
 	getAllKitchens(): Observable<Array<Kitchen>> {
-		return this.http.get<Array<Kitchen>>(`${this.backendUrl}/getAllKitchens`);
+		return this.http.get<Array<Kitchen>>(`${this.backendUrl}/restaurant/getAllKitchens`);
 	}
 	getCurrentlyUsedKitchens(): Observable<Array<Kitchen>> {
-		return this.http.get<Array<Kitchen>>(`${this.backendUrl}/getCurrentlyUsedKitchens`);
+		return this.http.get<Array<Kitchen>>(`${this.backendUrl}/restaurant/getCurrentlyUsedKitchens`);
 	}
 }

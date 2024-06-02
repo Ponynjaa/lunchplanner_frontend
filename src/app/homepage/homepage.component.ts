@@ -3,19 +3,18 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatListModule } from '@angular/material/list';
 import { RestaurantService } from '../services/restaurant.service';
 import { Kitchen, Restaurant, SubKitchen } from '../models/restaurant';
-import { KeycloakOperationService } from '../services/keycloak.service';
+import { ImageService } from '../services/image.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { MatMenuModule } from '@angular/material/menu';
-import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatExpansionModule } from '@angular/material/expansion';
+import { HeaderComponent } from '../header/header.component';
 
 @Component({
 	selector: 'app-homepage',
 	standalone: true,
-	imports: [MatSnackBarModule, CommonModule, FormsModule, MatListModule, MatButtonModule, MatMenuModule, MatIconModule, MatCheckboxModule, MatExpansionModule],
+	imports: [MatSnackBarModule, CommonModule, FormsModule, MatListModule, MatIconModule, MatCheckboxModule, MatExpansionModule, HeaderComponent],
 	templateUrl: './homepage.component.html',
 	styleUrl: './homepage.component.scss'
 })
@@ -23,75 +22,67 @@ export class HomepageComponent implements OnInit {
 	restaurants: Restaurant[] = [];
 	filteredRestaurants: Restaurant[] = [];
 	searchText: string = '';
-	userProfile: any | null = null;
 	isTooltipVisible = false;
 	kitchens: Kitchen[] = [];
 	kitchenFilter: any = {};
 
 	constructor(
 		private restaurantService: RestaurantService,
-		private keyCloakService: KeycloakOperationService,
+		private imageService: ImageService,
 		private snackBar: MatSnackBar
 	) { }
 
 	ngOnInit(): void {
 		this.getAllRestaurants();
 		this.getCurrentlyUsedKitchens();
-		this.keyCloakService.getUserProfile().then((data: any) => {
-			this.userProfile = data;
-			console.log(this.userProfile);
-		});
-	}
-
-	logout() {
-		this.keyCloakService.logout();
 	}
 
 	getSubkitchenDescriptions(subkitchens: SubKitchen[]): string {
-		return subkitchens.map(sk => sk.description).join(', ')
+		return subkitchens.map(sk => sk.description).join(', ');
 	}
 
 	updateAllComplete(kitchenId: number, subkitchenId: number) {
 		this.kitchenFilter[kitchenId].checked = Object.values(this.kitchenFilter[kitchenId].subkitchens).every((subkitchen: any) => subkitchen.checked);
 
-		this.updateSubkitchenRestaurantFilter(kitchenId, subkitchenId);
+		this.updateFilteredRestaurants();
 	}
 
-	updateSubkitchenRestaurantFilter(kitchenId: number, subkitchenId?: number) {
-		const kitchen = this.kitchenFilter[kitchenId];
-		const subkitchenIds = subkitchenId ? [subkitchenId] : Object.keys(kitchen.subkitchens);
+	updateSubkitchenRestaurantFilter(kitchenId: number | Array<number>, subkitchenId?: number) {
+		const kitchenIds = Array.isArray(kitchenId) ? kitchenId : [kitchenId];
 
-		for (const subkitchenId of subkitchenIds) {
-			const checked = kitchen.subkitchens[subkitchenId].checked;
+		for (const kitchenId of kitchenIds) {
+			const kitchen = this.kitchenFilter[kitchenId];
+			const subkitchenIds = subkitchenId ? [subkitchenId] : Object.keys(kitchen.subkitchens);
 
-			if (checked) {
-				const restaurantsToAdd = this.restaurants.filter((restaurant) => {
-					return restaurant.subkitchens.find(sk => sk.id == subkitchenId);
-				});
-
-				for (const restaurantToAdd of restaurantsToAdd) {
-					if (!this.filteredRestaurants.includes(restaurantToAdd)) {
-						this.filteredRestaurants.push(restaurantToAdd);
-					}
-				}
-			} else {
-				const allSubKitchens = Object.values(this.kitchenFilter).map((k: any) => k.subkitchens).reduce((prev, curr) => {
-					return {
-						...prev,
-						...curr
-					};
-				}, {});
-				console.log(allSubKitchens);
-
-				this.filteredRestaurants = this.filteredRestaurants.filter((restaurant) => {
-					return !restaurant.subkitchens.every(sk => {
-						return !allSubKitchens[sk.id].checked;
+			for (const subkitchenId of subkitchenIds) {
+				const checked = kitchen.subkitchens[subkitchenId].checked;
+	
+				if (checked) {
+					const restaurantsToAdd = this.restaurants.filter((restaurant) => {
+						return restaurant.subkitchens.find(sk => sk.id == subkitchenId);
 					});
-				});
+	
+					for (const restaurantToAdd of restaurantsToAdd) {
+						if (!this.filteredRestaurants.includes(restaurantToAdd)) {
+							this.filteredRestaurants.push(restaurantToAdd);
+						}
+					}
+				} else {
+					const allSubKitchens = Object.values(this.kitchenFilter).map((k: any) => k.subkitchens).reduce((prev, curr) => {
+						return {
+							...prev,
+							...curr
+						};
+					}, {});
+	
+					this.filteredRestaurants = this.filteredRestaurants.filter((restaurant) => {
+						return !restaurant.subkitchens.every(sk => {
+							return !allSubKitchens[sk.id].checked;
+						});
+					});
+				}
 			}
 		}
-
-		// TODO: combine with search
 
 		this.filteredRestaurants.sort((a, b) => a.name.localeCompare(b.name));
 	}
@@ -106,7 +97,7 @@ export class HomepageComponent implements OnInit {
 			this.kitchenFilter[kitchenId].subkitchens[subkitchen].checked = checked;
 		}
 
-		this.updateSubkitchenRestaurantFilter(kitchenId);
+		this.updateFilteredRestaurants();
 	}
 
 	getCurrentlyUsedKitchens() {
@@ -163,12 +154,15 @@ export class HomepageComponent implements OnInit {
 	}
 
 	public updateFilteredRestaurants() {
+		this.filteredRestaurants = Object.assign([], this.restaurants);
+		this.updateSubkitchenRestaurantFilter(this.kitchens.map((k) => k.id));
+
 		if (!this.searchText) {
-			this.filteredRestaurants = Object.assign([], this.restaurants);
+			return;
 		}
 
 		const searchText = this.searchText.toLowerCase();
-		this.filteredRestaurants = this.restaurants.filter((restaurant) => {
+		this.filteredRestaurants = this.filteredRestaurants.filter((restaurant) => {
 			return restaurant.name.toLowerCase().includes(searchText)
 				|| restaurant.city.toLowerCase().includes(searchText)
 				|| restaurant.street.toLowerCase().includes(searchText)

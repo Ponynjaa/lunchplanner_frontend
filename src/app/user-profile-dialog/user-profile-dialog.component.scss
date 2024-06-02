@@ -1,0 +1,39 @@
+mat-dialog-actions {
+	display: flex;
+	flex-direction: row;
+	justify-content: end;
+}
+
+.image-upload {
+	box-sizing: border-box;
+	display: flex;
+	flex-direction: row;
+	gap: 20px;
+	align-items: center;
+	margin-bottom: 30px;
+
+	// make it invisible but still viewable for screenreaders etc
+	input[type="file"] {
+		opacity: 0;
+		z-index: -1;
+		position: absolute;
+		width: 100px;
+	}
+
+	// display focus of file input on label
+	input[type="file"]:focus + label {
+		outline: 1px solid;
+	}
+
+	label {
+		display: block;
+		height: 40px;
+		width: 40px;
+		margin-left: auto;
+		background-position: center;
+		background-repeat: no-repeat;
+		background-size: cover;
+		cursor: pointer;
+		border-radius: 50%;
+	}
+}
