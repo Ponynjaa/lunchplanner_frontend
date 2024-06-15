@@ -20,7 +20,7 @@
 				<mat-chip-grid #subkitchenChips>
 					@for (subkitchen of restaurant.subkitchens; track subkitchen) {
 						<mat-chip-row (removed)="removeSubkitchen(subkitchen)">
-							{{ subkitchen.description }}
+							{{ subkitchen.description_de }}
 							<button matChipRemove>
 								<mat-icon>cancel</mat-icon>
 							</button>
@@ -38,9 +38,9 @@
 					(focus)="filterKitchens()">
 				<mat-autocomplete #kitchenAutocomplete="matAutocomplete" requireSelection autoActiveFirstOption [displayWith]="displayWith">
 					@for (kitchen of filteredKitchens; track kitchen) {
-						<mat-optgroup [label]="kitchen.description">
+						<mat-optgroup [label]="kitchen.description_de">
 							@for (subkitchen of kitchen.subkitchens; track subkitchen) {
-								<mat-option [value]="subkitchen">{{ subkitchen.description }}</mat-option>
+								<mat-option [value]="subkitchen">{{ subkitchen.description_de }}</mat-option>
 							}
 						</mat-optgroup>
 					}

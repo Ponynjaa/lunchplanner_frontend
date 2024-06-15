@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatListModule } from '@angular/material/list';
 import { RestaurantService } from '../services/restaurant.service';
-import { Kitchen, Restaurant, SubKitchen } from '../models/restaurant';
+import { Kitchen, LieferandoRestaurant, Restaurant, SubKitchen } from '../models/restaurant';
 import { ImageService } from '../services/image.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -19,8 +19,10 @@ import { HeaderComponent } from '../header/header.component';
 	styleUrl: './homepage.component.scss'
 })
 export class HomepageComponent implements OnInit {
-	restaurants: Restaurant[] = [];
-	filteredRestaurants: Restaurant[] = [];
+	customRestaurants: Restaurant[] = [];
+	filteredCustomRestaurants: Restaurant[] = [];
+	lieferandoRestaurants: LieferandoRestaurant[] = [];
+	filteredLieferandoRestaurants: LieferandoRestaurant[] = [];
 	searchText: string = '';
 	isTooltipVisible = false;
 	kitchens: Kitchen[] = [];
@@ -38,7 +40,7 @@ export class HomepageComponent implements OnInit {
 	}
 
 	getSubkitchenDescriptions(subkitchens: SubKitchen[]): string {
-		return subkitchens.map(sk => sk.description).join(', ');
+		return subkitchens.map(sk => sk.description_de).join(', ');
 	}
 
 	updateAllComplete(kitchenId: number, subkitchenId: number) {
@@ -58,13 +60,23 @@ export class HomepageComponent implements OnInit {
 				const checked = kitchen.subkitchens[subkitchenId].checked;
 	
 				if (checked) {
-					const restaurantsToAdd = this.restaurants.filter((restaurant) => {
+					const customRestaurantsToAdd = this.customRestaurants.filter((restaurant) => {
 						return restaurant.subkitchens.find(sk => sk.id == subkitchenId);
 					});
 	
-					for (const restaurantToAdd of restaurantsToAdd) {
-						if (!this.filteredRestaurants.includes(restaurantToAdd)) {
-							this.filteredRestaurants.push(restaurantToAdd);
+					for (const restaurantToAdd of customRestaurantsToAdd) {
+						if (!this.filteredCustomRestaurants.includes(restaurantToAdd)) {
+							this.filteredCustomRestaurants.push(restaurantToAdd);
+						}
+					}
+
+					const lieferandoRestaurantsToAdd = this.lieferandoRestaurants.filter((restaurant) => {
+						return restaurant.subkitchens.find(sk => sk.id == subkitchenId);
+					});
+	
+					for (const restaurantToAdd of lieferandoRestaurantsToAdd) {
+						if (!this.filteredLieferandoRestaurants.includes(restaurantToAdd)) {
+							this.filteredLieferandoRestaurants.push(restaurantToAdd);
 						}
 					}
 				} else {
@@ -75,7 +87,13 @@ export class HomepageComponent implements OnInit {
 						};
 					}, {});
 	
-					this.filteredRestaurants = this.filteredRestaurants.filter((restaurant) => {
+					this.filteredCustomRestaurants = this.filteredCustomRestaurants.filter((restaurant) => {
+						return !restaurant.subkitchens.every(sk => {
+							return !allSubKitchens[sk.id].checked;
+						});
+					});
+
+					this.filteredLieferandoRestaurants = this.filteredLieferandoRestaurants.filter((restaurant) => {
 						return !restaurant.subkitchens.every(sk => {
 							return !allSubKitchens[sk.id].checked;
 						});
@@ -84,7 +102,12 @@ export class HomepageComponent implements OnInit {
 			}
 		}
 
-		this.filteredRestaurants.sort((a, b) => a.name.localeCompare(b.name));
+		this.sortRestaurants();
+	}
+
+	sortRestaurants() {
+		this.filteredCustomRestaurants.sort((a, b) => a.name.localeCompare(b.name));
+		this.filteredLieferandoRestaurants.sort((a, b) => a.rating.localeCompare(b.rating));
 	}
 
 	someChecked(kitchenId: number): boolean {
@@ -106,11 +129,13 @@ export class HomepageComponent implements OnInit {
 				this.kitchens = kitchens;
 				this.kitchenFilter = kitchens.reduce((prev: any, curr) => {
 					prev[curr.id] = {
-						description: curr.description,
+						description_de: curr.description_de,
+						description_en: curr.description_en,
 						checked: true,
 						subkitchens: curr.subkitchens.reduce((prev: any, curr) => {
 							prev[curr.id] = {
-								description: curr.description,
+								description_de: curr.description_de,
+								description_en: curr.description_en,
 								checked: true
 							};
 
@@ -127,17 +152,37 @@ export class HomepageComponent implements OnInit {
 		});
 	}
 
-	getAllRestaurants() {
-		this.restaurantService.getAllRestaurants().subscribe({
-			next: (restaurants: Restaurant[]) => {
-				this.restaurants = restaurants;
-				this.filteredRestaurants = Object.assign([], restaurants);
-				this.updateFilteredRestaurants();
-			},
-			error: (error: any) => {
-				this.handleError(error.error);
-			}
+	async getAllRestaurants() {
+		const customRestaurantsPromise = new Promise((resolve, reject) => {
+			this.restaurantService.getAllCustomRestaurants().subscribe({
+				next: (restaurants: Restaurant[]) => {
+					this.customRestaurants = restaurants;
+					this.filteredCustomRestaurants = Object.assign([], restaurants);
+					resolve(restaurants);
+				},
+				error: (error: any) => {
+					this.handleError(error);
+					reject(error);
+				}
+			});
 		});
+
+		const lieferandoRestaurantsPromise = new Promise((resolve, reject) => {
+			this.restaurantService.getAllLieferandoRestaurants().subscribe({
+				next: (restaurants: LieferandoRestaurant[]) => {
+					this.lieferandoRestaurants = restaurants;
+					this.filteredLieferandoRestaurants = Object.assign([], restaurants);
+					resolve(restaurants);
+				},
+				error: (error: any) => {
+					this.handleError(error);
+					reject(error);
+				}
+			});
+		});
+
+		await Promise.all([customRestaurantsPromise, lieferandoRestaurantsPromise]);
+		this.updateFilteredRestaurants();
 	}
 
 	private handleError(error: any) {
@@ -154,7 +199,8 @@ export class HomepageComponent implements OnInit {
 	}
 
 	public updateFilteredRestaurants() {
-		this.filteredRestaurants = Object.assign([], this.restaurants);
+		this.filteredCustomRestaurants = Object.assign([], this.customRestaurants);
+		this.filteredLieferandoRestaurants = Object.assign([], this.filteredLieferandoRestaurants);
 		this.updateSubkitchenRestaurantFilter(this.kitchens.map((k) => k.id));
 
 		if (!this.searchText) {
@@ -162,13 +208,16 @@ export class HomepageComponent implements OnInit {
 		}
 
 		const searchText = this.searchText.toLowerCase();
-		this.filteredRestaurants = this.filteredRestaurants.filter((restaurant) => {
+		const filterFn = (restaurant: Restaurant) => {
 			return restaurant.name.toLowerCase().includes(searchText)
 				|| restaurant.city.toLowerCase().includes(searchText)
 				|| restaurant.street.toLowerCase().includes(searchText)
 				|| restaurant.subkitchens.join(' ').toLowerCase().includes(searchText);
-		});
+		};
 
-		this.filteredRestaurants.sort((a, b) => a.name.localeCompare(b.name));
+		this.filteredCustomRestaurants = this.filteredCustomRestaurants.filter(filterFn);
+		this.filteredLieferandoRestaurants = this.filteredLieferandoRestaurants.filter(filterFn);
+
+		this.sortRestaurants();
 	}
 }

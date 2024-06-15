@@ -15,7 +15,7 @@ import { HeaderComponent } from '../header/header.component';
 export const _subkitchenFilter = (opt: SubKitchen[], value: string): SubKitchen[] => {
 	const filterValue = value.toLowerCase();
 
-	return opt.filter(item => item.description.toLowerCase().includes(filterValue));
+	return opt.filter(item => item.description_de.toLowerCase().includes(filterValue));
 };
 
 @Component({
@@ -32,7 +32,8 @@ export class AddRestaurantComponent implements OnInit {
 	restaurantForm = this._formBuilder.group({
 		kitchen: {
 			id: 0,
-			description: ''
+			description_de: '',
+			description_en: ''
 		},
 		name: '',
 		street: '',
@@ -113,7 +114,7 @@ export class AddRestaurantComponent implements OnInit {
 		const value = this.kitchenInput.nativeElement.value.toLowerCase();
 		if (value) {
 			this.filteredKitchens = this.kitchens
-				.map(kitchen => ({ id: kitchen.id, description: kitchen.description, subkitchens: _subkitchenFilter(kitchen.subkitchens, value) }))
+				.map(kitchen => ({ id: kitchen.id, description_de: kitchen.description_de, description_en: kitchen.description_en, subkitchens: _subkitchenFilter(kitchen.subkitchens, value) }))
 				.filter(kitchen => kitchen.subkitchens.length > 0);
 			return;
 		}
@@ -130,6 +131,6 @@ export class AddRestaurantComponent implements OnInit {
 	}
 
 	displayWith(subkitchen: SubKitchen): string {
-		return subkitchen ? subkitchen.description : '';
+		return subkitchen ? subkitchen.description_de : '';
 	}
 }

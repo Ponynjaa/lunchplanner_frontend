@@ -18,14 +18,14 @@
 									[indeterminate]="someChecked(kitchen.id)"
 									(change)="setAll(kitchen.id, $event.checked)"
 									(click)="$event.stopPropagation()">
-									{{ kitchen.description }}
+									{{ kitchen.description_de }}
 								</mat-checkbox>
 							</mat-expansion-panel-header>
 							<ul class="subkitchens">
 								@for (subkitchen of kitchen.subkitchens; track subkitchen) {
 									<li>
 										<mat-checkbox [(ngModel)]="kitchenFilter[kitchen.id].subkitchens[subkitchen.id].checked" (ngModelChange)="updateAllComplete(kitchen.id, subkitchen.id)">
-											{{ subkitchen.description }}
+											{{ subkitchen.description_de }}
 										</mat-checkbox>
 									</li>
 								}
@@ -36,9 +36,30 @@
 			</div>
 		</div>
 		<div class="drawer-content">
-			<div class="restaurant-count">Wähle aus {{ filteredRestaurants.length }} Restaurants</div>
+			<div class="restaurant-count">Wähle aus {{ filteredCustomRestaurants.length + filteredLieferandoRestaurants.length }} Restaurants</div>
+			<div class="restaurants-label">Custom restaurants</div>
 			<mat-list>
-				@for (restaurant of filteredRestaurants; track restaurant) {
+				@for (restaurant of filteredCustomRestaurants; track restaurant) {
+					<mat-list-item>
+						<div class="restaurant" id="{{ restaurant.id }}">
+							<img class="restaurant-logo" [src]="restaurant.logourl" alt="{{ restaurant.name }}">
+							<div class="restaurant-info-container">
+								<h3 class="restaurant-name">{{ restaurant.name }}</h3>
+								<p class="restaurant-street">{{ restaurant.street }}</p>
+								<p class="restaurant-city">{{ restaurant.city }}</p>
+								<p class="restaurant-subkitchens">{{ getSubkitchenDescriptions(restaurant.subkitchens) }}</p>
+							</div>
+							<div class="restaurant-vote-container">
+								<button class="restaurant-upvote-button"><mat-icon>keyboard_arrow_up</mat-icon></button>
+								<button class="restaurant-downvote-button"><mat-icon>keyboard_arrow_down</mat-icon></button>
+							</div>
+						</div>
+					</mat-list-item>
+				}
+			</mat-list>
+			<div class="restaurants-label">Lieferando restaurants</div>
+			<mat-list>
+				@for (restaurant of filteredLieferandoRestaurants; track restaurant) {
 					<mat-list-item>
 						<div class="restaurant" id="{{ restaurant.id }}">
 							<img class="restaurant-logo" [src]="restaurant.logourl" alt="{{ restaurant.name }}">
