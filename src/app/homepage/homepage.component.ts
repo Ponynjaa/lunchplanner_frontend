@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatListModule } from '@angular/material/list';
 import { RestaurantService } from '../services/restaurant.service';
-import { Kitchen, LieferandoRestaurant, Restaurant, SubKitchen } from '../models/restaurant';
+import { DeliveryCosts, DeliveryMethods, ETA, Kitchen, LieferandoRestaurant, Restaurant, SubKitchen } from '../models/restaurant';
 import { ImageService } from '../services/image.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -10,11 +10,12 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { HeaderComponent } from '../header/header.component';
+import { GroupByPipe } from '../pipes/group-by.pipe';
 
 @Component({
 	selector: 'app-homepage',
 	standalone: true,
-	imports: [MatSnackBarModule, CommonModule, FormsModule, MatListModule, MatIconModule, MatCheckboxModule, MatExpansionModule, HeaderComponent],
+	imports: [MatSnackBarModule, CommonModule, FormsModule, MatListModule, MatIconModule, MatCheckboxModule, MatExpansionModule, HeaderComponent, GroupByPipe],
 	templateUrl: './homepage.component.html',
 	styleUrl: './homepage.component.scss'
 })
@@ -34,8 +35,8 @@ export class HomepageComponent implements OnInit {
 		private snackBar: MatSnackBar
 	) { }
 
-	ngOnInit(): void {
-		this.getAllRestaurants();
+	async ngOnInit(): Promise<void> {
+		await this.getAllRestaurants();
 		this.getCurrentlyUsedKitchens();
 	}
 
@@ -105,9 +106,111 @@ export class HomepageComponent implements OnInit {
 		this.sortRestaurants();
 	}
 
+	getGroupName(groupKey: string) {
+		if (groupKey === 'open') {
+			return 'Geöffnet';
+		} else if (groupKey === 'opens_soon') {
+			return 'Öffnet demnächst';
+		} else {
+			return 'Geschlossen';
+		}
+	}
+
+	getEta(restaurant: LieferandoRestaurant) {
+		const orderAhead = restaurant.deliveryMethods.delivery.orderAhead || restaurant.deliveryMethods.pickup.orderAhead;
+		if (orderAhead) {
+			const parts = orderAhead.split(':');
+			parts.pop();
+			const display = parts.join(':');
+			return `Ab ${display}`;
+		}
+
+		if (this.isClosed(restaurant)) {
+			return 'Vorübergehend geschlossen';
+		}
+
+		// for custom restaurants
+		if (!restaurant.eta) {
+			return '';
+		}
+
+		return `${restaurant.eta.min}-${restaurant.eta.max} min`;
+	}
+
+	isClosed(restaurant: Restaurant) {
+		return !restaurant.deliveryMethods.pickup.open && !restaurant.deliveryMethods.delivery.open;
+	}
+
+	getDeliveryMethods(deliveryMethods?: DeliveryMethods) {
+		if (!deliveryMethods) {
+			return '';
+		}
+
+		const delivery = deliveryMethods.delivery.open;
+		const pickup = deliveryMethods.pickup.open;
+		if (delivery && pickup) {
+			return 'Lieferung & Abholung';
+		} else if (delivery) {
+			return 'Nur Lieferung';
+		} else if (pickup) {
+			return 'Nur Abholung';
+		}
+
+		return 'Geschlossen';
+	}
+
+	getDeliveryCosts(deliveryCosts: DeliveryCosts) {
+		const costs = deliveryCosts.costs.costs;
+		if (costs === 0) {
+			return 'Kostenlos';
+		}
+
+		return `${this.formatNumber(costs / 100)}€`;
+	}
+
+	getDistance(miles: number) {
+		const km = miles * 1.609;
+		if (km < 1) {
+			return `${Math.round(km * 1000)}m`;
+		}
+
+		return `${this.formatNumber(km)}km`;
+	}
+
+	getFreeDeliveryAmount(restaurant: LieferandoRestaurant) {
+		if (this.isClosed(restaurant)) {
+			return '';
+		}
+
+		const costs = restaurant.deliveryCosts.costs;
+		if (costs.from === 0 && costs.to !== 0) {
+			return `Gratis Lieferung ab ${this.formatNumber(costs.to)}€`;
+		} else if (costs.from > 0) {
+			return `Gratis Lieferung unter ${this.formatNumber(costs.from)}€ und über ${this.formatNumber(costs.to)}€`;
+		}
+
+		return '';
+	}
+
+	getMinCosts(deliveryCosts: DeliveryCosts) {
+		if (deliveryCosts.minimumAmount === 0) {
+			return 'Kein Mindestbestellwert';
+		}
+
+		return `Min. ${this.formatNumber(deliveryCosts.minimumAmount / 100)}€`;
+	}
+
+	formatNumber(number: number) {
+		const userLocale = navigator.language; // Automatically detect user's locale
+		return new Intl.NumberFormat(userLocale, {
+			minimumFractionDigits: 2,
+			maximumFractionDigits: 2
+		}).format(number);
+	}
+
 	sortRestaurants() {
 		this.filteredCustomRestaurants.sort((a, b) => a.name.localeCompare(b.name));
-		this.filteredLieferandoRestaurants.sort((a, b) => a.rating.localeCompare(b.rating));
+		this.filteredLieferandoRestaurants.sort((a, b) => b.rating.localeCompare(a.rating));
 	}
 
 	someChecked(kitchenId: number): boolean {
@@ -123,33 +226,67 @@ export class HomepageComponent implements OnInit {
 		this.updateFilteredRestaurants();
 	}
 
-	getCurrentlyUsedKitchens() {
-		this.restaurantService.getCurrentlyUsedKitchens().subscribe({
-			next: (kitchens: Kitchen[]) => {
-				this.kitchens = kitchens;
-				this.kitchenFilter = kitchens.reduce((prev: any, curr) => {
+	async getAllKitchens(): Promise<Kitchen[]> {
+		return new Promise((resolve, reject) => {
+			this.restaurantService.getAllKitchens().subscribe({
+				next: (kitchens: Kitchen[]) => {
+					resolve(kitchens);
+				},
+				error: (error: any) => {
+					this.handleError(error);
+					reject(error);
+				}
+			});
+		});
+	}
+
+	async getCurrentlyUsedKitchens() {
+		const allKitchens = await this.getAllKitchens();
+
+		// Create a map of subkitchens by their ID
+		const subKitchenMap: { [key: number]: SubKitchen } = {};
+		allKitchens.forEach(kitchen => {
+			kitchen.subkitchens.forEach(subKitchen => {
+				subKitchenMap[subKitchen.id] = subKitchen;
+			});
+		});
+
+		// Create a map to track which subkitchens are used
+		const usedSubKitchens: { [key: number]: boolean } = {};
+		[...this.customRestaurants, ...this.lieferandoRestaurants].forEach(restaurant => {
+			restaurant.subkitchens.forEach(subKitchen => {
+				usedSubKitchens[subKitchen.id] = true;
+			});
+		});
+
+		// Create the result array with filtered subkitchens
+		const kitchens: Kitchen[] = allKitchens.map(kitchen => {
+			const filteredSubKitchens = kitchen.subkitchens.filter(subKitchen => usedSubKitchens[subKitchen.id]);
+			return {
+				...kitchen,
+				subkitchens: filteredSubKitchens
+			};
+		}).filter(kitchen => kitchen.subkitchens.length > 0); // Remove kitchens with empty subkitchens
+
+		this.kitchens = kitchens;
+		this.kitchenFilter = kitchens.reduce((prev: any, curr) => {
+			prev[curr.id] = {
+				description_de: curr.description_de,
+				description_en: curr.description_en,
+				checked: true,
+				subkitchens: curr.subkitchens.reduce((prev: any, curr) => {
 					prev[curr.id] = {
 						description_de: curr.description_de,
 						description_en: curr.description_en,
-						checked: true,
-						subkitchens: curr.subkitchens.reduce((prev: any, curr) => {
-							prev[curr.id] = {
-								description_de: curr.description_de,
-								description_en: curr.description_en,
-								checked: true
-							};
-
-							return prev;
-						}, {})
+						checked: true
 					};
 
 					return prev;
-				}, {});
-			},
-			error: (error: any) => {
-				this.handleError(error.error);
-			}
-		});
+				}, {})
+			};
+
+			return prev;
+		}, {});
 	}
 
 	async getAllRestaurants() {

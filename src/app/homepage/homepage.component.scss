@@ -103,21 +103,43 @@ mat-list-item {
 		.restaurant-info-container {
 			.restaurant-name {
 				font-weight: 500;
-				margin-bottom: 0;
+				font-size: 13pt;
+				margin-bottom: 5px;
 			}
 
-			.restaurant-street {
-				margin-bottom: 0;
-			}
-
-			.restaurant-city {
-				margin-top: -5px;
-			}
-
-			.restaurant-city,
-			.restaurant-street,
-			.restaurant-subkitchens {
+			.delivery-methods,
+			.restaurant-row1,
+			.restaurant-row2,
+			.restaurant-row3,
+			.restaurant-row4 {
 				color: var(--grey-text-color);
+				font-size: 11pt;
+				margin-bottom: 5px;
+			}
+
+			.restaurant-row1 {
+				display: flex;
+				gap: 4px;
+
+				> mat-icon {
+					color: yellow;
+				}
+			}
+
+			.restaurant-row2 {
+				display: flex;
+				gap: 4px;
+			}
+
+			.restaurant-row3 {
+				display: flex;
+				gap: 4px;
+				min-height: 24px;
+			}
+
+			.restaurant-row4 {
+				color: #3bdb3b;
+				min-height: 24px;
 			}
 		}
 

@@ -45,9 +45,10 @@
 							<img class="restaurant-logo" [src]="restaurant.logourl" alt="{{ restaurant.name }}">
 							<div class="restaurant-info-container">
 								<h3 class="restaurant-name">{{ restaurant.name }}</h3>
-								<p class="restaurant-street">{{ restaurant.street }}</p>
-								<p class="restaurant-city">{{ restaurant.city }}</p>
-								<p class="restaurant-subkitchens">{{ getSubkitchenDescriptions(restaurant.subkitchens) }}</p>
+								<p class="delivery-methods">{{ getDeliveryMethods(restaurant.deliveryMethods) }}</p>
+								<p class="restaurant-row1">{{ restaurant.street }}</p>
+								<p class="restaurant-row2">{{ restaurant.city }}</p>
+								<p class="restaurant-row3">{{ getSubkitchenDescriptions(restaurant.subkitchens) }}</p>
 							</div>
 							<div class="restaurant-vote-container">
 								<button class="restaurant-upvote-button"><mat-icon>keyboard_arrow_up</mat-icon></button>
@@ -58,25 +59,35 @@
 				}
 			</mat-list>
 			<div class="restaurants-label">Lieferando restaurants</div>
-			<mat-list>
-				@for (restaurant of filteredLieferandoRestaurants; track restaurant) {
-					<mat-list-item>
-						<div class="restaurant" id="{{ restaurant.id }}">
-							<img class="restaurant-logo" [src]="restaurant.logourl" alt="{{ restaurant.name }}">
-							<div class="restaurant-info-container">
-								<h3 class="restaurant-name">{{ restaurant.name }}</h3>
-								<p class="restaurant-street">{{ restaurant.street }}</p>
-								<p class="restaurant-city">{{ restaurant.city }}</p>
-								<p class="restaurant-subkitchens">{{ getSubkitchenDescriptions(restaurant.subkitchens) }}</p>
+			@for (group of filteredLieferandoRestaurants | groupRestaurants; track group) {
+				<h2>{{ getGroupName(group.key) }}</h2>
+				<mat-list>
+					@for (restaurant of group.value; track restaurant) {
+						<mat-list-item>
+							<div class="restaurant" id="{{ restaurant.id }}">
+								<img class="restaurant-logo" [src]="restaurant.logourl" alt="{{ restaurant.name }}">
+								<div class="restaurant-info-container">
+									<h3 class="restaurant-name">{{ restaurant.name }}</h3>
+									<p class="delivery-methods">{{ getDeliveryMethods(restaurant.deliveryMethods) }}</p>
+									<p class="restaurant-row1"><mat-icon>star</mat-icon> {{ restaurant.rating }} ({{ restaurant.ratingCount }}) · {{ getSubkitchenDescriptions(restaurant.subkitchens) }}</p>
+									<p class="restaurant-row2">
+										<mat-icon>schedule</mat-icon> {{ getEta(restaurant) }}
+										@if (group.key !== 'closed') {
+											· <mat-icon>pedal_bike</mat-icon> {{ getDeliveryCosts(restaurant.deliveryCosts) }} · <mat-icon>shopping_basket</mat-icon> {{ getMinCosts(restaurant.deliveryCosts) }}
+										}
+									</p>
+									<p class="restaurant-row3"><mat-icon>near_me</mat-icon> {{ getDistance(restaurant.distance) }} · <mat-icon>pin_drop</mat-icon> {{ restaurant.street }}</p>
+									<p class="restaurant-row4">{{ getFreeDeliveryAmount(restaurant) }}</p>
+								</div>
+								<div class="restaurant-vote-container">
+									<button class="restaurant-upvote-button"><mat-icon>keyboard_arrow_up</mat-icon></button>
+									<button class="restaurant-downvote-button"><mat-icon>keyboard_arrow_down</mat-icon></button>
+								</div>
 							</div>
-							<div class="restaurant-vote-container">
-								<button class="restaurant-upvote-button"><mat-icon>keyboard_arrow_up</mat-icon></button>
-								<button class="restaurant-downvote-button"><mat-icon>keyboard_arrow_down</mat-icon></button>
-							</div>
-						</div>
-					</mat-list-item>
-				}
-			</mat-list>
+						</mat-list-item>
+					}
+				</mat-list>
+			}
 		</div>
 	</div>
 </div>

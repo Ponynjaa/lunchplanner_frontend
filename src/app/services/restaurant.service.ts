@@ -15,6 +15,11 @@ export class RestaurantService {
 			postalCode: "94469",
 			latitude: "48.83875",
 			longitude: "12.94523"
+		},
+		muc: {
+			postalCode: "80809",
+			latitude: "48.170200",
+			longitude: "11.564700"
 		}
 	};
 
@@ -24,7 +29,7 @@ export class RestaurantService {
 		return this.http.get<Array<Restaurant>>(`${this.backendUrl}/restaurant/getAllCustomRestaurants`);
 	}
 	getAllLieferandoRestaurants(): Observable<Array<LieferandoRestaurant>> {
-		return this.http.get<Array<LieferandoRestaurant>>(`${this.backendUrl}/restaurant/getAllLieferandoRestaurants?postalCode=${this.coords.deg.postalCode}&latitude=${this.coords.deg.latitude}&longitude=${this.coords.deg.longitude}`);
+		return this.http.get<Array<LieferandoRestaurant>>(`${this.backendUrl}/restaurant/getAllLieferandoRestaurants?postalCode=${this.coords.muc.postalCode}&latitude=${this.coords.muc.latitude}&longitude=${this.coords.muc.longitude}`);
 	}
 	getCustomRestaurantDetails(id: number): Observable<Restaurant> {
 		return this.http.get<Restaurant>(`${this.backendUrl}/restaurant/getCustomRestaurantDetails?id=${id}`);

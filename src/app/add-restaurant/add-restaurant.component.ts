@@ -5,7 +5,7 @@ import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { RestaurantService } from '../services/restaurant.service';
-import { Restaurant, Kitchen, SubKitchen } from '../models/restaurant';
+import { Restaurant, Kitchen, SubKitchen, OrderMethod } from '../models/restaurant';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatIconModule } from '@angular/material/icon';
@@ -47,6 +47,17 @@ export class AddRestaurantComponent implements OnInit {
 		city: '',
 		street: '',
 		logourl: '',
+		deliveryMethods: {
+			orderMethods: OrderMethod.PICKUP,
+			delivery: {
+				open: 0,
+				orderAhead: ''
+			},
+			pickup: {
+				open: 0,
+				orderAhead: ''
+			}
+		},
 		subkitchens: []
 	};
 
