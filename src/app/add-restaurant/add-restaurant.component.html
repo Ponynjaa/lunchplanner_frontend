@@ -3,6 +3,11 @@
 
 	<div class="wrapper">
 		<form [formGroup]="restaurantForm" class="form">
+			<div class="image-upload">
+				<div class="image-label">Restaurant logo</div>
+				<input type="file" id="restaurantLogo" (change)="onFileSelected($event)" accept="image/*">
+				<label for="restaurantLogo" #restaurantLogoLabel></label>
+			</div>
 			<mat-form-field appearance="outline">
 				<mat-label>Name</mat-label>
 				<input type="text" matInput formControlName="name" required>
@@ -46,6 +51,8 @@
 					}
 				</mat-autocomplete>
 			</mat-form-field>
+			<mat-checkbox formControlName="delivery">Delivery</mat-checkbox>
+			<mat-checkbox formControlName="pickup">Pickup</mat-checkbox>
 			<button type="submit" mat-stroked-button (click)="addRestaurant()">
 				<mat-icon fontIcon="add"></mat-icon>
 				<span>Add restaurant</span>

@@ -37,7 +37,7 @@
 		</div>
 		<div class="drawer-content">
 			<div class="restaurant-count">Wähle aus {{ filteredCustomRestaurants.length + filteredLieferandoRestaurants.length }} Restaurants</div>
-			<div class="restaurants-label">Custom restaurants</div>
+			<h1 class="restaurants-label">Custom restaurants</h1>
 			<mat-list>
 				@for (restaurant of filteredCustomRestaurants; track restaurant) {
 					<mat-list-item>
@@ -45,10 +45,9 @@
 							<img class="restaurant-logo" [src]="restaurant.logourl" alt="{{ restaurant.name }}">
 							<div class="restaurant-info-container">
 								<h3 class="restaurant-name">{{ restaurant.name }}</h3>
-								<p class="delivery-methods">{{ getDeliveryMethods(restaurant.deliveryMethods) }}</p>
-								<p class="restaurant-row1">{{ restaurant.street }}</p>
-								<p class="restaurant-row2">{{ restaurant.city }}</p>
-								<p class="restaurant-row3">{{ getSubkitchenDescriptions(restaurant.subkitchens) }}</p>
+								<p class="delivery-methods">{{ getDeliveryMethods(restaurant) }}</p>
+								<p class="restaurant-row1">{{ getSubkitchenDescriptions(restaurant.subkitchens) }}</p>
+								<p class="restaurant-row2"><mat-icon>pin_drop</mat-icon> {{ restaurant.street }}, {{ restaurant.city }}</p>
 							</div>
 							<div class="restaurant-vote-container">
 								<button class="restaurant-upvote-button"><mat-icon>keyboard_arrow_up</mat-icon></button>
@@ -58,9 +57,11 @@
 					</mat-list-item>
 				}
 			</mat-list>
-			<div class="restaurants-label">Lieferando restaurants</div>
+			<h1 class="restaurants-label">Lieferando restaurants</h1>
 			@for (group of filteredLieferandoRestaurants | groupRestaurants; track group) {
-				<h2>{{ getGroupName(group.key) }}</h2>
+				@if (group.value.length > 0) {
+					<h2>{{ getGroupName(group.key) }}</h2>
+				}
 				<mat-list>
 					@for (restaurant of group.value; track restaurant) {
 						<mat-list-item>
@@ -76,7 +77,7 @@
 											· <mat-icon>pedal_bike</mat-icon> {{ getDeliveryCosts(restaurant.deliveryCosts) }} · <mat-icon>shopping_basket</mat-icon> {{ getMinCosts(restaurant.deliveryCosts) }}
 										}
 									</p>
-									<p class="restaurant-row3"><mat-icon>near_me</mat-icon> {{ getDistance(restaurant.distance) }} · <mat-icon>pin_drop</mat-icon> {{ restaurant.street }}</p>
+									<p class="restaurant-row3"><mat-icon>near_me</mat-icon> {{ getDistance(restaurant.distance) }} · <mat-icon>pin_drop</mat-icon> {{ restaurant.street }}, {{ restaurant.city }}</p>
 									<p class="restaurant-row4">{{ getFreeDeliveryAmount(restaurant) }}</p>
 								</div>
 								<div class="restaurant-vote-container">

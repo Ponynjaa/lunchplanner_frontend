@@ -1,5 +1,6 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { MatCheckboxModule } from '@angular/material/checkbox';
 import { AsyncPipe } from '@angular/common';
 import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatInputModule } from '@angular/material/input';
@@ -18,15 +19,35 @@ export const _subkitchenFilter = (opt: SubKitchen[], value: string): SubKitchen[
 	return opt.filter(item => item.description_de.toLowerCase().includes(filterValue));
 };
 
+interface NewRestaurant {
+	name: string;
+	city: string;
+	street: string;
+	logo: File | null;
+	delivery: boolean;
+	pickup: boolean;
+	subkitchens: SubKitchen[];
+};
+
 @Component({
 	selector: 'app-add-restaurant',
 	standalone: true,
-	imports: [HeaderComponent, FormsModule, ReactiveFormsModule, MatFormFieldModule, MatInputModule, MatAutocompleteModule, AsyncPipe, MatChipsModule, MatIconModule, MatButtonModule],
+	imports: [HeaderComponent, FormsModule, ReactiveFormsModule, MatFormFieldModule, MatInputModule, MatAutocompleteModule, AsyncPipe, MatChipsModule, MatIconModule, MatButtonModule, MatCheckboxModule],
 	templateUrl: './add-restaurant.component.html',
 	styleUrl: './add-restaurant.component.scss'
 })
 export class AddRestaurantComponent implements OnInit {
 	@ViewChild('kitchenInput') kitchenInput!: ElementRef<HTMLInputElement>;
+
+	private _restaurantLogoLabel!: ElementRef<HTMLLabelElement>;
+	@ViewChild('restaurantLogoLabel')
+	set restaurantLogoLabel(restaurantLogoLabel: ElementRef<HTMLLabelElement>) {
+		// restaurantLogoLabel.nativeElement.style.backgroundImage = `url('${this.imageUrl}')`;
+		this._restaurantLogoLabel = restaurantLogoLabel;
+	}
+	get restaurantLogoLabel(): ElementRef<HTMLLabelElement> {
+		return this._restaurantLogoLabel;
+	}
 
 	kitchens: Kitchen[] = [];
 	restaurantForm = this._formBuilder.group({
@@ -36,28 +57,20 @@ export class AddRestaurantComponent implements OnInit {
 			description_en: ''
 		},
 		name: '',
+		city: '',
 		street: '',
-		city: ''
+		delivery: false,
+		pickup: false
 	});
 	filteredKitchens: Kitchen[] = [];
 
-	restaurant: Restaurant = {
-		id: 0,
+	restaurant: NewRestaurant = {
 		name: '',
 		city: '',
 		street: '',
-		logourl: '',
-		deliveryMethods: {
-			orderMethods: OrderMethod.PICKUP,
-			delivery: {
-				open: 0,
-				orderAhead: ''
-			},
-			pickup: {
-				open: 0,
-				orderAhead: ''
-			}
-		},
+		logo: null,
+		delivery: false,
+		pickup: false,
 		subkitchens: []
 	};
 
@@ -74,31 +87,50 @@ export class AddRestaurantComponent implements OnInit {
 				}
 			}
 		});
-		this.restaurantForm.get('name')!.valueChanges.subscribe({
-			next: (name: string | null) => {
-				if (name !== null) {
-					this.restaurant.name = name;
+
+		this.registerValueChangeHandler(['name', 'city', 'street', 'pickup', 'delivery']);
+	}
+
+	registerValueChangeHandler(keys: Array<keyof NewRestaurant>) {
+		for (const key of keys) {
+			this.restaurantForm.get(key)!.valueChanges.subscribe({
+				next: (value) => {
+					if (value !== null) {
+						this.restaurant[key] = value as never;
+					}
 				}
-			}
-		});
-		this.restaurantForm.get('city')!.valueChanges.subscribe({
-			next: (city: string | null) => {
-				if (city !== null) {
-					this.restaurant.city = city;
-				}
-			}
-		});
-		this.restaurantForm.get('street')!.valueChanges.subscribe({
-			next: (street: string | null) => {
-				if (street !== null) {
-					this.restaurant.street = street;
-				}
-			}
-		});
+			});
+		}
+	}
+
+	onFileSelected(event: Event): void {
+		const fileInput = event.target as HTMLInputElement;
+		if (fileInput.files && fileInput.files.length > 0) {
+			this.restaurant.logo = fileInput.files[0];
+			const imageUrl = URL.createObjectURL(this.restaurant.logo);
+			this.restaurantLogoLabel.nativeElement.style.backgroundImage = `url('${imageUrl}')`;
+		}
 	}
 
 	addRestaurant() {
 		console.log(this.restaurant);
+
+		if (!this.restaurant.logo || this.restaurant.subkitchens.length === 0) {
+			const msg = !this.restaurant.logo ? 'Logo is missing' : 'At least one kitchen is required';
+			const error = new Error(msg);
+			this.handleError(error);
+			return;
+		}
+
+		const subkitchens = this.restaurant.subkitchens.map((subkitchen) => subkitchen.id);
+		this.restaurantService.addCustomRestaurant(this.restaurant.name, this.restaurant.city, this.restaurant.street, subkitchens, this.restaurant.delivery, this.restaurant.pickup, this.restaurant.logo).subscribe({
+			next: (response) => {
+				console.log(response);
+			},
+			error: (error) => {
+				this.handleError(error);
+			}
+		})
 	}
 
 	private async getAllKitchens() {
@@ -107,8 +139,8 @@ export class AddRestaurantComponent implements OnInit {
 				this.kitchens = kitchens;
 				this.filteredKitchens = Object.assign([], kitchens);
 			},
-			error: (error: any) => {
-				this.handleError(error.error);
+			error: (error) => {
+				this.handleError(error);
 			}
 		});
 	}
@@ -134,7 +166,8 @@ export class AddRestaurantComponent implements OnInit {
 	}
 
 	private handleError(error: any) {
-		this.displayError(error.code + ' ' + error.reason + '. ' + error.message);
+		console.error(error);
+		this.displayError(error.message);
 	}
 
 	private displayError(message: string) {

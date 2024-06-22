@@ -4,6 +4,10 @@ mat-dialog-actions {
 	justify-content: end;
 }
 
+mat-dialog-content {
+	overflow: visible;
+}
+
 .image-upload {
 	box-sizing: border-box;
 	display: flex;
@@ -22,7 +26,7 @@ mat-dialog-actions {
 
 	// display focus of file input on label
 	input[type="file"]:focus + label {
-		outline: 1px solid;
+		outline: 2px solid;
 	}
 
 	label {

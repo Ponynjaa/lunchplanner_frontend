@@ -4,7 +4,6 @@ export interface Restaurant {
 	logourl: string;
 	city: string;
 	street: string;
-	deliveryMethods: DeliveryMethods;
 	subkitchens: SubKitchen[];
 }
 
@@ -39,6 +38,11 @@ export interface DeliveryCosts {
 export interface ETA {
 	min: number;
 	max: number;
+}
+
+export interface CustomRestaurant extends Restaurant {
+	delivery: boolean;
+	pickup: boolean;
 }
 
 export interface LieferandoRestaurant extends Restaurant {

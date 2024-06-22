@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatListModule } from '@angular/material/list';
 import { RestaurantService } from '../services/restaurant.service';
-import { DeliveryCosts, DeliveryMethods, ETA, Kitchen, LieferandoRestaurant, Restaurant, SubKitchen } from '../models/restaurant';
+import { CustomRestaurant, DeliveryCosts, DeliveryMethods, ETA, Kitchen, LieferandoRestaurant, Restaurant, SubKitchen } from '../models/restaurant';
 import { ImageService } from '../services/image.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -20,8 +20,8 @@ import { GroupByPipe } from '../pipes/group-by.pipe';
 	styleUrl: './homepage.component.scss'
 })
 export class HomepageComponent implements OnInit {
-	customRestaurants: Restaurant[] = [];
-	filteredCustomRestaurants: Restaurant[] = [];
+	customRestaurants: CustomRestaurant[] = [];
+	filteredCustomRestaurants: CustomRestaurant[] = [];
 	lieferandoRestaurants: LieferandoRestaurant[] = [];
 	filteredLieferandoRestaurants: LieferandoRestaurant[] = [];
 	searchText: string = '';
@@ -129,25 +129,20 @@ export class HomepageComponent implements OnInit {
 			return 'Vorübergehend geschlossen';
 		}
 
-		// for custom restaurants
-		if (!restaurant.eta) {
-			return '';
-		}
-
 		return `${restaurant.eta.min}-${restaurant.eta.max} min`;
 	}
 
-	isClosed(restaurant: Restaurant) {
+	isClosed(restaurant: LieferandoRestaurant) {
 		return !restaurant.deliveryMethods.pickup.open && !restaurant.deliveryMethods.delivery.open;
 	}
 
-	getDeliveryMethods(deliveryMethods?: DeliveryMethods) {
+	getDeliveryMethods(deliveryMethods?: DeliveryMethods|CustomRestaurant) {
 		if (!deliveryMethods) {
 			return '';
 		}
 
-		const delivery = deliveryMethods.delivery.open;
-		const pickup = deliveryMethods.pickup.open;
+		const delivery = typeof deliveryMethods.delivery === 'boolean' ? deliveryMethods.delivery : deliveryMethods.delivery.open;
+		const pickup = typeof deliveryMethods.pickup === 'boolean' ? deliveryMethods.pickup : deliveryMethods.pickup.open;
 		if (delivery && pickup) {
 			return 'Lieferung & Abholung';
 		} else if (delivery) {
@@ -171,10 +166,10 @@ export class HomepageComponent implements OnInit {
 	getDistance(miles: number) {
 		const km = miles * 1.609;
 		if (km < 1) {
-			return `${Math.round(km * 1000)}m`;
+			return `${Math.round(km * 1000)} m`;
 		}
 
-		return `${this.formatNumber(km)}km`;
+		return `${this.formatNumber(km)} km`;
 	}
 
 	getFreeDeliveryAmount(restaurant: LieferandoRestaurant) {
@@ -210,7 +205,20 @@ export class HomepageComponent implements OnInit {
 
 	sortRestaurants() {
 		this.filteredCustomRestaurants.sort((a, b) => a.name.localeCompare(b.name));
-		this.filteredLieferandoRestaurants.sort((a, b) => b.rating.localeCompare(a.rating));
+		this.filteredLieferandoRestaurants.sort((a, b) => {
+			if (a.new && !b.new) return -1;
+			if (!a.new && b.new) return 1;
+
+			const rating = b.rating.localeCompare(a.rating);
+			if (rating !== 0) {
+				return rating;
+			}
+
+			if (a.ratingCount < b.ratingCount) return 1;
+			if (a.ratingCount > b.ratingCount) return -1;
+
+			return 0;
+		});
 	}
 
 	someChecked(kitchenId: number): boolean {
@@ -292,7 +300,7 @@ export class HomepageComponent implements OnInit {
 	async getAllRestaurants() {
 		const customRestaurantsPromise = new Promise((resolve, reject) => {
 			this.restaurantService.getAllCustomRestaurants().subscribe({
-				next: (restaurants: Restaurant[]) => {
+				next: (restaurants: CustomRestaurant[]) => {
 					this.customRestaurants = restaurants;
 					this.filteredCustomRestaurants = Object.assign([], restaurants);
 					resolve(restaurants);
@@ -305,7 +313,7 @@ export class HomepageComponent implements OnInit {
 		});
 
 		const lieferandoRestaurantsPromise = new Promise((resolve, reject) => {
-			this.restaurantService.getAllLieferandoRestaurants().subscribe({
+			this.restaurantService.getAllLieferandoRestaurants('deg').subscribe({
 				next: (restaurants: LieferandoRestaurant[]) => {
 					this.lieferandoRestaurants = restaurants;
 					this.filteredLieferandoRestaurants = Object.assign([], restaurants);
