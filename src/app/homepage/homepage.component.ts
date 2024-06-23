@@ -203,6 +203,28 @@ export class HomepageComponent implements OnInit {
 		}).format(number);
 	}
 
+	async upvote(restaurant: Restaurant, lieferando: boolean) {
+		this.restaurantService.upvote(restaurant.id, restaurant.name, lieferando).subscribe({
+			next: (response) => {
+				console.log(response);
+			},
+			error: (error) => {
+				this.handleError(error);
+			}
+		});
+	}
+
+	async downvote(restaurant: Restaurant, lieferando: boolean) {
+		this.restaurantService.downvote(restaurant.id, restaurant.name, lieferando).subscribe({
+			next: (response) => {
+				console.log(response);
+			},
+			error: (error) => {
+				this.handleError(error);
+			}
+		});
+	}
+
 	sortRestaurants() {
 		this.filteredCustomRestaurants.sort((a, b) => a.name.localeCompare(b.name));
 		this.filteredLieferandoRestaurants.sort((a, b) => {
@@ -301,6 +323,7 @@ export class HomepageComponent implements OnInit {
 		const customRestaurantsPromise = new Promise((resolve, reject) => {
 			this.restaurantService.getAllCustomRestaurants().subscribe({
 				next: (restaurants: CustomRestaurant[]) => {
+					console.log("CUSTOM", restaurants);
 					this.customRestaurants = restaurants;
 					this.filteredCustomRestaurants = Object.assign([], restaurants);
 					resolve(restaurants);
@@ -315,6 +338,7 @@ export class HomepageComponent implements OnInit {
 		const lieferandoRestaurantsPromise = new Promise((resolve, reject) => {
 			this.restaurantService.getAllLieferandoRestaurants('deg').subscribe({
 				next: (restaurants: LieferandoRestaurant[]) => {
+					console.log("LIEFERANDO", restaurants);
 					this.lieferandoRestaurants = restaurants;
 					this.filteredLieferandoRestaurants = Object.assign([], restaurants);
 					resolve(restaurants);

@@ -25,6 +25,12 @@ export class RestaurantService {
 
 	constructor(private http: HttpClient) { }
 
+	upvote(restaurantId: string, restaurantName: string, lieferando: boolean) {
+		return this.http.post(`${this.backendUrl}/restaurant/upvote`, { restaurantId, restaurantName, lieferando });
+	}
+	downvote(restaurantId: string, restaurantName: string, lieferando: boolean) {
+		return this.http.post(`${this.backendUrl}/restaurant/downvote`, { restaurantId, restaurantName, lieferando });
+	}
 	getAllCustomRestaurants(): Observable<Array<CustomRestaurant>> {
 		return this.http.get<Array<CustomRestaurant>>(`${this.backendUrl}/restaurant/getAllCustomRestaurants`);
 	}

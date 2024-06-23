@@ -1,10 +1,11 @@
 export interface Restaurant {
-	id: number;
+	id: string;
 	name: string;
 	logourl: string;
 	city: string;
 	street: string;
 	subkitchens: SubKitchen[];
+	votes: number | null;
 }
 
 export enum OrderMethod {

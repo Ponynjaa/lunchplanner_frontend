@@ -50,8 +50,9 @@
 								<p class="restaurant-row2"><mat-icon>pin_drop</mat-icon> {{ restaurant.street }}, {{ restaurant.city }}</p>
 							</div>
 							<div class="restaurant-vote-container">
-								<button class="restaurant-upvote-button"><mat-icon>keyboard_arrow_up</mat-icon></button>
-								<button class="restaurant-downvote-button"><mat-icon>keyboard_arrow_down</mat-icon></button>
+								<button class="restaurant-upvote-button" (click)="upvote(restaurant, false)"><mat-icon>keyboard_arrow_up</mat-icon></button>
+								<div class="restaurant-votes">{{ restaurant.votes ?? 0 }}</div>
+								<button class="restaurant-downvote-button" (click)="downvote(restaurant, false)"><mat-icon>keyboard_arrow_down</mat-icon></button>
 							</div>
 						</div>
 					</mat-list-item>
@@ -81,8 +82,9 @@
 									<p class="restaurant-row4">{{ getFreeDeliveryAmount(restaurant) }}</p>
 								</div>
 								<div class="restaurant-vote-container">
-									<button class="restaurant-upvote-button"><mat-icon>keyboard_arrow_up</mat-icon></button>
-									<button class="restaurant-downvote-button"><mat-icon>keyboard_arrow_down</mat-icon></button>
+									<button class="restaurant-upvote-button" (click)="upvote(restaurant, true)"><mat-icon>keyboard_arrow_up</mat-icon></button>
+									<div class="restaurant-votes">{{ restaurant.votes ?? 0 }}</div>
+									<button class="restaurant-downvote-button" (click)="downvote(restaurant, true)"><mat-icon>keyboard_arrow_down</mat-icon></button>
 								</div>
 							</div>
 						</mat-list-item>
