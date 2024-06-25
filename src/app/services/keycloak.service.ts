@@ -7,13 +7,16 @@ import { KeycloakService } from 'keycloak-angular';
 export class KeycloakOperationService {
 	constructor(private readonly keycloak: KeycloakService) { }
 
-	isLoggedIn(): boolean {
+	isLoggedIn() {
 		return this.keycloak.isLoggedIn();
 	}
-	logout(): void {
+	async logout() {
 		this.keycloak.logout();
 	}
-	getUserProfile(): any {
+	async getUserProfile() {
 		return this.keycloak.loadUserProfile();
+	}
+	async getToken() {
+		return this.keycloak.getToken();
 	}
 }

@@ -11,6 +11,8 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatExpansionModule } from '@angular/material/expansion';
 import { HeaderComponent } from '../header/header.component';
 import { GroupByPipe } from '../pipes/group-by.pipe';
+import { WebSocketService } from '../services/websocket.service';
+import { KeycloakOperationService } from '../services/keycloak.service';
 
 @Component({
 	selector: 'app-homepage',
@@ -32,12 +34,40 @@ export class HomepageComponent implements OnInit {
 	constructor(
 		private restaurantService: RestaurantService,
 		private imageService: ImageService,
+		private keycloakService: KeycloakOperationService,
+		private webSocketService: WebSocketService,
 		private snackBar: MatSnackBar
 	) { }
 
 	async ngOnInit(): Promise<void> {
 		await this.getAllRestaurants();
 		this.getCurrentlyUsedKitchens();
+
+		const token = await this.keycloakService.getToken();
+		this.webSocketService.connect(token).subscribe({
+			next: (value) => {
+				const restaurantsToUpdate = [];
+				if (value.lieferando) {
+					restaurantsToUpdate.push(this.lieferandoRestaurants.find((restaurant) => restaurant.id === value.restaurantId));
+					restaurantsToUpdate.push(this.filteredLieferandoRestaurants.find((restaurant) => restaurant.id === value.restaurantId));
+				} else {
+					restaurantsToUpdate.push(this.customRestaurants.find((restaurant) => restaurant.id === value.restaurantId));
+					restaurantsToUpdate.push(this.filteredCustomRestaurants.find((restaurant) => restaurant.id === value.restaurantId));
+				}
+
+				for (const restaurant of restaurantsToUpdate) {
+					if (!restaurant) {
+						continue;
+					}
+
+					restaurant.votes = value.votes;
+				}
+			},
+			error: (error) => {
+				console.error(error);
+				this.handleError(error);
+			}
+		});
 	}
 
 	getSubkitchenDescriptions(subkitchens: SubKitchen[]): string {
@@ -206,7 +236,7 @@ export class HomepageComponent implements OnInit {
 	async upvote(restaurant: Restaurant, lieferando: boolean) {
 		this.restaurantService.upvote(restaurant.id, restaurant.name, lieferando).subscribe({
 			next: (response) => {
-				console.log(response);
+				// nothing
 			},
 			error: (error) => {
 				this.handleError(error);
@@ -217,7 +247,7 @@ export class HomepageComponent implements OnInit {
 	async downvote(restaurant: Restaurant, lieferando: boolean) {
 		this.restaurantService.downvote(restaurant.id, restaurant.name, lieferando).subscribe({
 			next: (response) => {
-				console.log(response);
+				// nothing
 			},
 			error: (error) => {
 				this.handleError(error);
@@ -323,7 +353,6 @@ export class HomepageComponent implements OnInit {
 		const customRestaurantsPromise = new Promise((resolve, reject) => {
 			this.restaurantService.getAllCustomRestaurants().subscribe({
 				next: (restaurants: CustomRestaurant[]) => {
-					console.log("CUSTOM", restaurants);
 					this.customRestaurants = restaurants;
 					this.filteredCustomRestaurants = Object.assign([], restaurants);
 					resolve(restaurants);
@@ -338,7 +367,6 @@ export class HomepageComponent implements OnInit {
 		const lieferandoRestaurantsPromise = new Promise((resolve, reject) => {
 			this.restaurantService.getAllLieferandoRestaurants('deg').subscribe({
 				next: (restaurants: LieferandoRestaurant[]) => {
-					console.log("LIEFERANDO", restaurants);
 					this.lieferandoRestaurants = restaurants;
 					this.filteredLieferandoRestaurants = Object.assign([], restaurants);
 					resolve(restaurants);

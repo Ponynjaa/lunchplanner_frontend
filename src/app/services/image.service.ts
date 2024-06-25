@@ -14,11 +14,11 @@ export class ImageService {
 		return this.http.get(`${this.backendUrl}/getUserImage?userId=${userId}`, { responseType: 'blob' });
 	}
 
-	createImageFromBlob(image: Blob): Promise<string|ArrayBuffer|null> {
+	createImageFromBlob(image: Blob): Promise<string> {
 		return new Promise((resolve, reject) => {
 			let reader = new FileReader();
 			reader.addEventListener("load", () => {
-				resolve(reader.result);
+				resolve(reader.result as string);
 			}, false);
 
 			if (image) {

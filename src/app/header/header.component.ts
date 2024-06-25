@@ -6,6 +6,8 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { ImageService } from '../services/image.service';
 import { MatDialog } from '@angular/material/dialog';
+import { KeycloakProfile } from 'keycloak-js';
+import { UserProfile } from '../models/user';
 import { UserProfileDialogComponent } from '../user-profile-dialog/user-profile-dialog.component';
 
 @Component({
@@ -16,18 +18,16 @@ import { UserProfileDialogComponent } from '../user-profile-dialog/user-profile-
 	styleUrl: './header.component.scss'
 })
 export class HeaderComponent implements OnInit {
-	userProfile: any;
+	userProfile?: UserProfile;
 
-	constructor(private keyCloakService: KeycloakOperationService, private imageService: ImageService, public dialog: MatDialog) { }
+	constructor(private keycloakService: KeycloakOperationService, private imageService: ImageService, public dialog: MatDialog) { }
 
 	ngOnInit() {
-		this.keyCloakService.getUserProfile().then((data: any) => {
+		this.keycloakService.getUserProfile().then((data: KeycloakProfile) => {
 			this.userProfile = data;
-			console.log(this.userProfile);
-		}).finally(() => {
-			this.imageService.getUserImage(this.userProfile?.id).subscribe({
+			this.imageService.getUserImage(this.userProfile.id!).subscribe({
 				next: async (value) => {
-					this.userProfile.userImage = await this.imageService.createImageFromBlob(value);
+					this.userProfile!.userImage = await this.imageService.createImageFromBlob(value);
 				}
 			});
 		});
@@ -39,13 +39,13 @@ export class HeaderComponent implements OnInit {
 		});
 
 		dialogRef.afterClosed().subscribe(result => {
-			if (result?.userImage) {
-				this.userProfile.userImage = result.userImage;
+			if (result.userImage) {
+				this.userProfile!.userImage = result.userImage;
 			}
 		});
 	}
 
 	logout() {
-		this.keyCloakService.logout();
+		this.keycloakService.logout();
 	}
 }
