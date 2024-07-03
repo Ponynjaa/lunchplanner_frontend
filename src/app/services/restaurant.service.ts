@@ -31,6 +31,9 @@ export class RestaurantService {
 	downvote(restaurantId: string, restaurantName: string, lieferando: boolean) {
 		return this.http.post(`${this.backendUrl}/restaurant/downvote`, { restaurantId, restaurantName, lieferando });
 	}
+	removeVote(restaurantId: string) {
+		return this.http.post(`${this.backendUrl}/restaurant/removeVote`, { restaurantId });
+	}
 	getAllCustomRestaurants(): Observable<Array<CustomRestaurant>> {
 		return this.http.get<Array<CustomRestaurant>>(`${this.backendUrl}/restaurant/getAllCustomRestaurants`);
 	}

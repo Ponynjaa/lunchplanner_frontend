@@ -6,6 +6,8 @@ export interface Restaurant {
 	street: string;
 	subkitchens: SubKitchen[];
 	votes: number | null;
+	upvotes: string[];
+	downvotes: string[];
 }
 
 export enum OrderMethod {

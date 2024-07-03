@@ -3,7 +3,6 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatListModule } from '@angular/material/list';
 import { RestaurantService } from '../services/restaurant.service';
 import { CustomRestaurant, DeliveryCosts, DeliveryMethods, ETA, Kitchen, LieferandoRestaurant, Restaurant, SubKitchen } from '../models/restaurant';
-import { ImageService } from '../services/image.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
@@ -13,6 +12,7 @@ import { HeaderComponent } from '../header/header.component';
 import { GroupByPipe } from '../pipes/group-by.pipe';
 import { WebSocketService } from '../services/websocket.service';
 import { KeycloakOperationService } from '../services/keycloak.service';
+import { UserProfile } from '../models/user';
 
 @Component({
 	selector: 'app-homepage',
@@ -30,22 +30,24 @@ export class HomepageComponent implements OnInit {
 	isTooltipVisible = false;
 	kitchens: Kitchen[] = [];
 	kitchenFilter: any = {};
+	loggedInUser?: UserProfile;
 
 	constructor(
 		private restaurantService: RestaurantService,
-		private imageService: ImageService,
 		private keycloakService: KeycloakOperationService,
 		private webSocketService: WebSocketService,
 		private snackBar: MatSnackBar
 	) { }
 
 	async ngOnInit(): Promise<void> {
+		this.loggedInUser = await this.keycloakService.getUserProfile();
 		await this.getAllRestaurants();
 		this.getCurrentlyUsedKitchens();
 
 		const token = await this.keycloakService.getToken();
 		this.webSocketService.connect(token).subscribe({
 			next: (value) => {
+				console.log(value);
 				const restaurantsToUpdate = [];
 				if (value.lieferando) {
 					restaurantsToUpdate.push(this.lieferandoRestaurants.find((restaurant) => restaurant.id === value.restaurantId));
@@ -61,13 +63,21 @@ export class HomepageComponent implements OnInit {
 					}
 
 					restaurant.votes = value.votes;
+					restaurant.upvotes = value.upvotes;
+					restaurant.downvotes = value.downvotes;
 				}
+
+				this.sortRestaurants();
 			},
 			error: (error) => {
 				console.error(error);
 				this.handleError(error);
 			}
 		});
+	}
+
+	isActive(votes: any[]) {
+		return votes.some((vote) => vote.id === this.loggedInUser?.id);
 	}
 
 	getSubkitchenDescriptions(subkitchens: SubKitchen[]): string {
@@ -234,6 +244,12 @@ export class HomepageComponent implements OnInit {
 	}
 
 	async upvote(restaurant: Restaurant, lieferando: boolean) {
+		// if user already upvoted remove vote
+		if (this.isActive(restaurant.upvotes)) {
+			this.removeVote(restaurant.id);
+			return;
+		}
+
 		this.restaurantService.upvote(restaurant.id, restaurant.name, lieferando).subscribe({
 			next: (response) => {
 				// nothing
@@ -255,9 +271,32 @@ export class HomepageComponent implements OnInit {
 		});
 	}
 
+	removeVote(restaurantId: string) {
+		this.restaurantService.removeVote(restaurantId).subscribe({
+			next: (response) => {
+				// nothing
+			},
+			error: (error) => {
+				this.handleError(error);
+			}
+		});
+	}
+
 	sortRestaurants() {
-		this.filteredCustomRestaurants.sort((a, b) => a.name.localeCompare(b.name));
-		this.filteredLieferandoRestaurants.sort((a, b) => {
+		this.filteredCustomRestaurants = [...this.filteredCustomRestaurants].sort((a, b) => {
+			const aVotes = a.votes ?? 0;
+			const bVotes  = b.votes ?? 0;
+			if (aVotes > bVotes) return -1;
+			if (aVotes < bVotes) return 1;
+
+			return a.name.localeCompare(b.name)
+		});
+		this.filteredLieferandoRestaurants = [...this.filteredLieferandoRestaurants].sort((a, b) => {
+			const aVotes = a.votes ?? 0;
+			const bVotes  = b.votes ?? 0;
+			if (aVotes > bVotes) return -1;
+			if (aVotes < bVotes) return 1;
+
 			if (a.new && !b.new) return -1;
 			if (!a.new && b.new) return 1;
 
