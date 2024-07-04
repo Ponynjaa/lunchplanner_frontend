@@ -40,9 +40,9 @@
 			@if (filteredCustomRestaurants.length > 0) {
 				<h1 class="restaurants-label">Custom restaurants</h1>
 			}
-			<mat-list>
+			<ul>
 				@for (restaurant of filteredCustomRestaurants; track restaurant) {
-					<mat-list-item>
+					<li>
 						<div class="restaurant" id="{{ restaurant.id }}">
 							<img class="restaurant-logo" [src]="restaurant.logourl" alt="{{ restaurant.name }}">
 							<div class="restaurant-info-container">
@@ -57,9 +57,9 @@
 								<button class="restaurant-downvote-button" (click)="downvote(restaurant, false)"><mat-icon>keyboard_arrow_down</mat-icon></button>
 							</div>
 						</div>
-					</mat-list-item>
+					</li>
 				}
-			</mat-list>
+			</ul>
 			@if (filteredLieferandoRestaurants.length > 0) {
 				<h1 class="restaurants-label">Lieferando restaurants</h1>
 			}
@@ -67,9 +67,9 @@
 				@if (group.value.length > 0) {
 					<h2>{{ getGroupName(group.key) }}</h2>
 				}
-				<mat-list>
+				<ul>
 					@for (restaurant of group.value; track restaurant) {
-						<mat-list-item [class.new]="restaurant.new">
+						<li [class.new]="restaurant.new">
 							<div class="restaurant" id="{{ restaurant.id }}">
 								<img class="restaurant-logo" [src]="restaurant.logourl" alt="{{ restaurant.name }}">
 								<div class="restaurant-info-container">
@@ -101,22 +101,28 @@
 								<div class="restaurant-vote-container">
 									<div class="restaurant-upvote-users">
 										@for (upvote of restaurant.upvotes; track upvote) {
-											<img [src]="upvote.userImage">
+											<div class="user-container">
+												<img [src]="upvote.userImage">
+												<div class="user-container-tooltip">{{ upvote.firstName }} {{ upvote.lastName }}</div>
+											</div>
 										}
 									</div>
 									<button class="restaurant-upvote-button" [class.active]="isActive(restaurant.upvotes)" (click)="upvote(restaurant, true)"><mat-icon>keyboard_arrow_up</mat-icon></button>
 									<div class="restaurant-votes">{{ restaurant.votes ?? 0 }}</div>
 									<div class="restaurant-downvote-users">
 										@for (downvote of restaurant.downvotes; track downvote) {
-											<img [src]="downvote.userImage">
+											<div class="user-container">
+												<img [src]="downvote.userImage">
+												<div class="user-container-tooltip">{{ downvote.firstName }} {{ downvote.lastName }}</div>
+											</div>
 										}
 									</div>
 									<button class="restaurant-downvote-button" [class.active]="isActive(restaurant.downvotes)" (click)="downvote(restaurant, true)"><mat-icon>keyboard_arrow_down</mat-icon></button>
 								</div>
 							</div>
-						</mat-list-item>
+						</li>
 					}
-				</mat-list>
+				</ul>
 			}
 		</div>
 	</div>

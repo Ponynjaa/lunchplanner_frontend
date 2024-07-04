@@ -87,17 +87,20 @@ mat-expansion-panel {
 	user-select: none;
 }
 
-mat-list {
+ul {
 	padding: unset;
 }
 
-mat-list-item {
+li {
+	position: relative;
 	padding-top: 10px;
 	padding-bottom: 10px;
 	height: 100% !important;
 	background-color: var(--foreground-color);
 	margin-bottom: 10px;
 	border-radius: 10px;
+	overflow: visible;
+	clip-path: rect(0 0 100% 200%);
 
 	// don't decrease opacity when hovering over list item
 	--mdc-list-list-item-hover-state-layer-opacity: 1;
@@ -117,6 +120,8 @@ mat-list-item {
 		display: flex;
 		flex-direction: row;
 		align-items: center;
+		padding: 5px 15px;
+		font-size: 11pt;
 
 		.restaurant-logo {
 			border-radius: 10px;
@@ -146,15 +151,15 @@ mat-list-item {
 					display: flex;
 					gap: 4px;
 				}
+
 				color: var(--grey-text-color);
-				font-size: 11pt;
 				margin-bottom: 5px;
 				display: flex;
 				gap: 4px;
 			}
 
 			.restaurant-row1 {
-				> mat-icon {
+				>mat-icon {
 					color: yellow;
 				}
 			}
@@ -186,13 +191,67 @@ mat-list-item {
 				grid-column: 1;
 				display: flex;
 				align-items: center;
+				justify-content: end;
+				width: calc(9px * 6 + 15px);
 
-				> img {
-					border-radius: 50%;
+				.user-container-tooltip {
+					position: relative;
+					opacity: 0;
+					pointer-events: none;
+					background: #505050;
+					color: white;
+					width: fit-content;
+					white-space: nowrap;
+					border-radius: 5px;
+					padding: 3px 5px;
+					margin-top: 3px;
+					left: 50%;
+					translate: -50%;
+				
+					&::after {
+						content: '';
+						position: absolute;
+						background: inherit;
+						clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+						height: 6px;
+						width: 12px;
+						top: -5px;
+						left: 50%;
+						translate: -50% 0;
+					}
+				}
+
+				.user-container {
+					--duration: .2s;
+
 					width: 24px;
 					height: 24px;
-					object-fit: cover;
-					object-position: center;
+					display: block;
+					cursor: pointer;
+					background: none;
+					transition: margin-left var(--duration);
+
+					&:not(:first-child) {
+						margin-left: -15px;
+					}
+
+					&:hover+.user-container {
+						margin-left: 0;
+						transition: margin-left var(--duration);
+					}
+
+					&:hover .user-container-tooltip {
+						opacity: 1;
+						transition: opacity var(--duration) var(--duration);
+					}
+
+					>img {
+						border-radius: 50%;
+						width: 24px;
+						height: 24px;
+						object-fit: cover;
+						object-position: center;
+					}
 				}
 			}
 
@@ -226,13 +285,13 @@ mat-list-item {
 				}
 
 				:active,
-				&.active > mat-icon {
+				&.active>mat-icon {
 					background-color: #342f32;
 					border-radius: 50%;
 					transition: background-color cubic-bezier(0.68, -0.55, 0.265, 1.55);
 				}
 
-				&.active > mat-icon {
+				&.active>mat-icon {
 					font-weight: 900;
 				}
 			}

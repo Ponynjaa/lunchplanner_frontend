@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
-import { MatListModule } from '@angular/material/list';
 import { RestaurantService } from '../services/restaurant.service';
 import { CustomRestaurant, DeliveryCosts, DeliveryMethods, ETA, Kitchen, LieferandoRestaurant, Restaurant, SubKitchen } from '../models/restaurant';
 import { CommonModule } from '@angular/common';
@@ -8,6 +7,7 @@ import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 import { MatExpansionModule } from '@angular/material/expansion';
+import { MatTooltipModule } from '@angular/material/tooltip';
 import { HeaderComponent } from '../header/header.component';
 import { GroupByPipe } from '../pipes/group-by.pipe';
 import { WebSocketService } from '../services/websocket.service';
@@ -17,7 +17,7 @@ import { UserProfile } from '../models/user';
 @Component({
 	selector: 'app-homepage',
 	standalone: true,
-	imports: [MatSnackBarModule, CommonModule, FormsModule, MatListModule, MatIconModule, MatCheckboxModule, MatExpansionModule, HeaderComponent, GroupByPipe],
+	imports: [MatSnackBarModule, CommonModule, FormsModule, MatIconModule, MatCheckboxModule, MatExpansionModule, HeaderComponent, GroupByPipe, MatTooltipModule],
 	templateUrl: './homepage.component.html',
 	styleUrl: './homepage.component.scss'
 })
@@ -261,6 +261,12 @@ export class HomepageComponent implements OnInit {
 	}
 
 	async downvote(restaurant: Restaurant, lieferando: boolean) {
+		// if user already downvoted remove vote
+		if (this.isActive(restaurant.downvotes)) {
+			this.removeVote(restaurant.id);
+			return;
+		}
+
 		this.restaurantService.downvote(restaurant.id, restaurant.name, lieferando).subscribe({
 			next: (response) => {
 				// nothing
