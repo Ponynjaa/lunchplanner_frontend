@@ -1,0 +1,12 @@
+<div class="popup-content">
+	<ul>
+		@for (vote of votes; track vote) {
+			<li>
+				<img [src]="vote.userImage">
+				<div>
+					{{ vote.firstName }} {{ vote.lastName }}
+				</div>
+			</li>
+		}
+	</ul>
+</div>

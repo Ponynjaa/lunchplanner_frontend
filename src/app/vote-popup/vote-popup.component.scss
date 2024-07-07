@@ -1,0 +1,27 @@
+.popup-content {
+	max-height: 70vh;
+	background: #101112;
+	border: none;
+	padding: 5px 15px;
+	color: inherit;
+	border-radius: 10px;
+	white-space: nowrap;
+	overflow: scroll;
+
+	ul {
+		padding: 0;
+
+		li {
+			display: flex;
+			gap: 10px;
+			padding: 10px 0;
+			align-items: center;
+	
+			>img {
+				width: 35px;
+				height: 35px;
+				border-radius: 50%;
+			}
+		}
+	}
+}

@@ -6,8 +6,15 @@ export interface Restaurant {
 	street: string;
 	subkitchens: SubKitchen[];
 	votes: number | null;
-	upvotes: string[];
-	downvotes: string[];
+	upvotes: Vote[];
+	downvotes: Vote[];
+}
+
+export interface Vote {
+	id: string,
+	userImage: string,
+	firstName: string,
+	lastName: string
 }
 
 export enum OrderMethod {

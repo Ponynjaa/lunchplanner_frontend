@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { RestaurantService } from '../services/restaurant.service';
-import { CustomRestaurant, DeliveryCosts, DeliveryMethods, ETA, Kitchen, LieferandoRestaurant, Restaurant, SubKitchen } from '../models/restaurant';
+import { CustomRestaurant, DeliveryCosts, DeliveryMethods, Kitchen, LieferandoRestaurant, Restaurant, SubKitchen } from '../models/restaurant';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
@@ -13,24 +13,25 @@ import { GroupByPipe } from '../pipes/group-by.pipe';
 import { WebSocketService } from '../services/websocket.service';
 import { KeycloakOperationService } from '../services/keycloak.service';
 import { UserProfile } from '../models/user';
+import { VotesComponent } from '../votes/votes.component';
 
 @Component({
 	selector: 'app-homepage',
 	standalone: true,
-	imports: [MatSnackBarModule, CommonModule, FormsModule, MatIconModule, MatCheckboxModule, MatExpansionModule, HeaderComponent, GroupByPipe, MatTooltipModule],
+	imports: [MatSnackBarModule, CommonModule, FormsModule, MatIconModule, MatCheckboxModule, MatExpansionModule, HeaderComponent, GroupByPipe, MatTooltipModule, VotesComponent],
 	templateUrl: './homepage.component.html',
 	styleUrl: './homepage.component.scss'
 })
 export class HomepageComponent implements OnInit {
-	customRestaurants: CustomRestaurant[] = [];
-	filteredCustomRestaurants: CustomRestaurant[] = [];
-	lieferandoRestaurants: LieferandoRestaurant[] = [];
-	filteredLieferandoRestaurants: LieferandoRestaurant[] = [];
-	searchText: string = '';
-	isTooltipVisible = false;
-	kitchens: Kitchen[] = [];
-	kitchenFilter: any = {};
-	loggedInUser?: UserProfile;
+	protected customRestaurants: CustomRestaurant[] = [];
+	protected filteredCustomRestaurants: CustomRestaurant[] = [];
+	protected lieferandoRestaurants: LieferandoRestaurant[] = [];
+	protected filteredLieferandoRestaurants: LieferandoRestaurant[] = [];
+	protected searchText: string = '';
+	protected isTooltipVisible = false;
+	protected kitchens: Kitchen[] = [];
+	protected kitchenFilter: any = {};
+	protected loggedInUser?: UserProfile;
 
 	constructor(
 		private restaurantService: RestaurantService,
@@ -42,38 +43,43 @@ export class HomepageComponent implements OnInit {
 	async ngOnInit(): Promise<void> {
 		this.loggedInUser = await this.keycloakService.getUserProfile();
 		await this.getAllRestaurants();
+		console.log(this.lieferandoRestaurants);
 		this.getCurrentlyUsedKitchens();
 
 		const token = await this.keycloakService.getToken();
 		this.webSocketService.connect(token).subscribe({
 			next: (value) => {
 				console.log(value);
-				const restaurantsToUpdate = [];
-				if (value.lieferando) {
-					restaurantsToUpdate.push(this.lieferandoRestaurants.find((restaurant) => restaurant.id === value.restaurantId));
-					restaurantsToUpdate.push(this.filteredLieferandoRestaurants.find((restaurant) => restaurant.id === value.restaurantId));
-				} else {
-					restaurantsToUpdate.push(this.customRestaurants.find((restaurant) => restaurant.id === value.restaurantId));
-					restaurantsToUpdate.push(this.filteredCustomRestaurants.find((restaurant) => restaurant.id === value.restaurantId));
-				}
-
-				for (const restaurant of restaurantsToUpdate) {
-					if (!restaurant) {
-						continue;
-					}
-
-					restaurant.votes = value.votes;
-					restaurant.upvotes = value.upvotes;
-					restaurant.downvotes = value.downvotes;
-				}
-
-				this.sortRestaurants();
+				this.updateRestaurantVotes(value);
 			},
 			error: (error) => {
 				console.error(error);
 				this.handleError(error);
 			}
 		});
+	}
+
+	updateRestaurantVotes(value: any) {
+		const restaurantsToUpdate = [];
+		if (value.lieferando) {
+			restaurantsToUpdate.push(this.lieferandoRestaurants.find((restaurant) => restaurant.id === value.restaurantId));
+			restaurantsToUpdate.push(this.filteredLieferandoRestaurants.find((restaurant) => restaurant.id === value.restaurantId));
+		} else {
+			restaurantsToUpdate.push(this.customRestaurants.find((restaurant) => restaurant.id === value.restaurantId));
+			restaurantsToUpdate.push(this.filteredCustomRestaurants.find((restaurant) => restaurant.id === value.restaurantId));
+		}
+
+		for (const restaurant of restaurantsToUpdate) {
+			if (!restaurant) {
+				continue;
+			}
+
+			restaurant.votes = value.votes;
+			restaurant.upvotes = value.upvotes;
+			restaurant.downvotes = value.downvotes;
+		}
+
+		this.sortRestaurants();
 	}
 
 	isActive(votes: any[]) {
@@ -252,7 +258,7 @@ export class HomepageComponent implements OnInit {
 
 		this.restaurantService.upvote(restaurant.id, restaurant.name, lieferando).subscribe({
 			next: (response) => {
-				// nothing
+				this.updateRestaurantVotes(response);
 			},
 			error: (error) => {
 				this.handleError(error);
@@ -269,7 +275,7 @@ export class HomepageComponent implements OnInit {
 
 		this.restaurantService.downvote(restaurant.id, restaurant.name, lieferando).subscribe({
 			next: (response) => {
-				// nothing
+				this.updateRestaurantVotes(response);
 			},
 			error: (error) => {
 				this.handleError(error);
@@ -280,7 +286,7 @@ export class HomepageComponent implements OnInit {
 	removeVote(restaurantId: string) {
 		this.restaurantService.removeVote(restaurantId).subscribe({
 			next: (response) => {
-				// nothing
+				this.updateRestaurantVotes(response);
 			},
 			error: (error) => {
 				this.handleError(error);
@@ -295,26 +301,54 @@ export class HomepageComponent implements OnInit {
 			if (aVotes > bVotes) return -1;
 			if (aVotes < bVotes) return 1;
 
-			return a.name.localeCompare(b.name)
+			// most upvotes => all the way on top
+			// most downvotes => all the way on the bottom
+			const aUpvotes = a.upvotes.length;
+			const bUpvotes = b.upvotes.length;
+
+			// when there's exactly the same amount of upvotes and downvotes on a restaurant
+			// also show them near the top to show that there's a lot of discussion
+			if (aUpvotes !== bUpvotes) {
+				return bUpvotes - aUpvotes;
+			}
+
+			// just compare the rest by name as there's no `new`, or ratings for custom restaurants
+			return a.name.localeCompare(b.name);
 		});
 		this.filteredLieferandoRestaurants = [...this.filteredLieferandoRestaurants].sort((a, b) => {
 			const aVotes = a.votes ?? 0;
-			const bVotes  = b.votes ?? 0;
-			if (aVotes > bVotes) return -1;
-			if (aVotes < bVotes) return 1;
+			const bVotes = b.votes ?? 0;
 
+			// most upvotes => all the way on top
+			// most downvotes => all the way on the bottom
+			if (aVotes !== bVotes) {
+				return bVotes - aVotes;
+			}
+
+			const aUpvotes = a.upvotes.length;
+			const bUpvotes = b.upvotes.length;
+
+			// when there's exactly the same amount of upvotes and downvotes on a restaurant
+			// also show them near the top to show that there's a lot of discussion
+			if (aUpvotes !== bUpvotes) {
+				return bUpvotes - aUpvotes;
+			}
+
+			// new restaurants should be positioned near the top
 			if (a.new && !b.new) return -1;
 			if (!a.new && b.new) return 1;
 
+			// high rated restaurants should be favored
 			const rating = b.rating.localeCompare(a.rating);
 			if (rating !== 0) {
 				return rating;
 			}
 
+			// restaurants with more ratings should be favored
 			if (a.ratingCount < b.ratingCount) return 1;
 			if (a.ratingCount > b.ratingCount) return -1;
 
-			return 0;
+			return a.name.localeCompare(b.name);
 		});
 	}
 

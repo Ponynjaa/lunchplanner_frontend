@@ -1,4 +1,5 @@
 import { Pipe, PipeTransform } from '@angular/core';
+import { LieferandoRestaurant } from '../models/restaurant';
 
 @Pipe({
 	name: 'groupRestaurants',
@@ -6,12 +7,12 @@ import { Pipe, PipeTransform } from '@angular/core';
 })
 export class GroupByPipe implements PipeTransform {
 
-	transform(collection: any[]): any[] {
+	transform(collection: LieferandoRestaurant[]) {
 		if (!collection) {
 			return [];
 		}
 
-		const groupedCollection = collection.reduce((previous, current) => {
+		const groupedCollection = collection.reduce((previous: any, current) => {
 			let groupKey;
 			if (!current.deliveryMethods.delivery.open && !current.deliveryMethods.pickup.open) {
 				groupKey = 'closed';
@@ -30,7 +31,10 @@ export class GroupByPipe implements PipeTransform {
 			return previous;
 		}, {});
 
-		const sortedGroups = [
+		const sortedGroups: {
+			key: string;
+			value: LieferandoRestaurant[];
+		}[] = [
 			{ key: 'open', value: groupedCollection['open'] || [] },
 			{ key: 'opens_soon', value: groupedCollection['opens_soon'] || [] },
 			{ key: 'closed', value: groupedCollection['closed'] || [] }

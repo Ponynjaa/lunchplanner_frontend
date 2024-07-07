@@ -1,0 +1,22 @@
+<div class="vote-users" cdkOverlayOrigin #triggerVoteListOverlay="cdkOverlayOrigin" (click)="voteListOverlayOpen = !voteListOverlayOpen">
+	@for (vote of votes | slice:0:5; track vote) {
+		<div class="user-container">
+			<img [src]="vote.userImage">
+			<div class="user-container-tooltip">{{ vote.firstName }} {{ vote.lastName }}</div>
+		</div>
+	}
+	@if (votes.length > 5) {
+		<button class="user-container">
+			<div class="plus-users">+{{ votes.length - 5 }}</div>
+			<div class="user-container-tooltip">Alle anzeigen</div>
+		</button>
+	}
+</div>
+
+<ng-template
+	cdkConnectedOverlay
+	[cdkConnectedOverlayOrigin]="triggerVoteListOverlay"
+	[cdkConnectedOverlayOpen]="voteListOverlayOpen"
+	(overlayOutsideClick)="voteListOverlayOpen = false">
+	<vote-popup [votes]="votes"></vote-popup>
+</ng-template>

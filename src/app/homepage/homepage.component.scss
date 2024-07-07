@@ -100,7 +100,7 @@ li {
 	margin-bottom: 10px;
 	border-radius: 10px;
 	overflow: visible;
-	clip-path: rect(0 0 100% 200%);
+	clip-path: rect(0 0 200% 200%);
 
 	// don't decrease opacity when hovering over list item
 	--mdc-list-list-item-hover-state-layer-opacity: 1;
@@ -176,83 +176,22 @@ li {
 
 		.restaurant-vote-container {
 			display: grid;
+			gap: 10px;
 			margin-left: auto;
 
-			.restaurant-upvote-users {
-				grid-row: 1;
-			}
-
-			.restaurant-downvote-users {
-				grid-row: 3;
-			}
-
-			.restaurant-upvote-users,
-			.restaurant-downvote-users {
+			.upvotes,
+			.downvotes {
 				grid-column: 1;
 				display: flex;
 				align-items: center;
-				justify-content: end;
-				width: calc(9px * 6 + 15px);
+			}
 
-				.user-container-tooltip {
-					position: relative;
-					opacity: 0;
-					pointer-events: none;
-					background: #505050;
-					color: white;
-					width: fit-content;
-					white-space: nowrap;
-					border-radius: 5px;
-					padding: 3px 5px;
-					margin-top: 3px;
-					left: 50%;
-					translate: -50%;
-				
-					&::after {
-						content: '';
-						position: absolute;
-						background: inherit;
-						clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
-						height: 6px;
-						width: 12px;
-						top: -5px;
-						left: 50%;
-						translate: -50% 0;
-					}
-				}
+			.upvotes {
+				grid-row: 1;
+			}
 
-				.user-container {
-					--duration: .2s;
-
-					width: 24px;
-					height: 24px;
-					display: block;
-					cursor: pointer;
-					background: none;
-					transition: margin-left var(--duration);
-
-					&:not(:first-child) {
-						margin-left: -15px;
-					}
-
-					&:hover+.user-container {
-						margin-left: 0;
-						transition: margin-left var(--duration);
-					}
-
-					&:hover .user-container-tooltip {
-						opacity: 1;
-						transition: opacity var(--duration) var(--duration);
-					}
-
-					>img {
-						border-radius: 50%;
-						width: 24px;
-						height: 24px;
-						object-fit: cover;
-						object-position: center;
-					}
-				}
+			.downvotes {
+				grid-row: 3;
 			}
 
 			.restaurant-upvote-button {
@@ -267,6 +206,12 @@ li {
 			.restaurant-downvote-button {
 				grid-column: 2;
 				position: relative;
+				width: 45px;
+				height: 45px;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+				font-size: 20pt;
 				background-color: inherit;
 				border-color: transparent;
 				border-radius: 50%;
@@ -274,25 +219,30 @@ li {
 				cursor: pointer;
 				transition-duration: 0.4s;
 
-				mat-icon {
-					padding: 7px;
+				>mat-icon {
+					font-weight: inherit;
+					font-size: inherit;
+					display: flex;
+					align-items: center;
+					justify-content: center;
 				}
 
-				:hover {
+				&:hover {
 					background-color: #2c272b;
 					transition: background-color 0.1s;
 					border-radius: 50%;
 				}
 
-				:active,
-				&.active>mat-icon {
+				&:active,
+				&.active {
 					background-color: #342f32;
 					border-radius: 50%;
 					transition: background-color cubic-bezier(0.68, -0.55, 0.265, 1.55);
 				}
 
-				&.active>mat-icon {
+				&.active {
 					font-weight: 900;
+					text-shadow: 0 0 5px #fff;
 				}
 			}
 
@@ -300,6 +250,7 @@ li {
 				grid-row: 2;
 				grid-column: 2;
 				text-align: center;
+				font-size: 16pt;
 			}
 		}
 	}
