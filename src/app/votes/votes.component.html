@@ -1,4 +1,4 @@
-<div class="vote-users" cdkOverlayOrigin #triggerVoteListOverlay="cdkOverlayOrigin" (click)="voteListOverlayOpen = !voteListOverlayOpen">
+<div class="vote-users" cdkOverlayOrigin #triggerVoteListOverlay="cdkOverlayOrigin" (click)="onVoteUserClick($event)">
 	@for (vote of votes | slice:0:5; track vote) {
 		<div class="user-container">
 			<img [src]="vote.userImage">

@@ -1,0 +1,39 @@
+.home-page-container {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+
+app-header {
+	width: 100%;
+}
+
+// TODO: completely stupid layout atm, needs some work...
+.content-container {
+	display: grid;
+	grid-template-columns: 1fr 1fr 1fr;
+	grid-template-rows: auto auto;
+	align-items: center;
+	justify-items: center;
+
+	.restaurant-logo {
+		border-radius: 10px;
+		height: auto;
+		width: auto;
+		max-width: 200px;
+		object-fit: cover;
+		object-position: center;
+		margin-right: 30px;
+		padding: 20px;
+	}
+
+	.pdf-viewer {
+		grid-row: 2;
+		padding: 10px 20px;
+	
+		object {
+			width: 60vw;
+			height: 70vh;
+		}
+	}
+}

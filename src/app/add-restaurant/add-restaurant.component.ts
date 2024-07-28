@@ -24,6 +24,7 @@ interface NewRestaurant {
 	city: string;
 	street: string;
 	logo: File | null;
+	menu: File | null;
 	delivery: boolean;
 	pickup: boolean;
 	subkitchens: SubKitchen[];
@@ -39,14 +40,13 @@ interface NewRestaurant {
 export class AddRestaurantComponent implements OnInit {
 	@ViewChild('kitchenInput') kitchenInput!: ElementRef<HTMLInputElement>;
 
-	private _restaurantLogoLabel!: ElementRef<HTMLLabelElement>;
-	@ViewChild('restaurantLogoLabel')
-	set restaurantLogoLabel(restaurantLogoLabel: ElementRef<HTMLLabelElement>) {
-		// restaurantLogoLabel.nativeElement.style.backgroundImage = `url('${this.imageUrl}')`;
-		this._restaurantLogoLabel = restaurantLogoLabel;
+	private _logoLabel!: ElementRef<HTMLLabelElement>;
+	@ViewChild('logoLabel')
+	set logoLabel(logoLabel: ElementRef<HTMLLabelElement>) {
+		this._logoLabel = logoLabel;
 	}
-	get restaurantLogoLabel(): ElementRef<HTMLLabelElement> {
-		return this._restaurantLogoLabel;
+	get logoLabel(): ElementRef<HTMLLabelElement> {
+		return this._logoLabel;
 	}
 
 	kitchens: Kitchen[] = [];
@@ -68,6 +68,7 @@ export class AddRestaurantComponent implements OnInit {
 		name: '',
 		city: '',
 		street: '',
+		menu: null,
 		logo: null,
 		delivery: false,
 		pickup: false,
@@ -103,27 +104,44 @@ export class AddRestaurantComponent implements OnInit {
 		}
 	}
 
-	onFileSelected(event: Event): void {
+	onLogoChange(event: Event): void {
 		const fileInput = event.target as HTMLInputElement;
 		if (fileInput.files && fileInput.files.length > 0) {
 			this.restaurant.logo = fileInput.files[0];
 			const imageUrl = URL.createObjectURL(this.restaurant.logo);
-			this.restaurantLogoLabel.nativeElement.style.backgroundImage = `url('${imageUrl}')`;
+			this.logoLabel.nativeElement.style.backgroundImage = `url('${imageUrl}')`;
+		}
+	}
+
+	onMenuChange(event: Event): void {
+		const fileInput = event.target as HTMLInputElement;
+		if (fileInput.files && fileInput.files.length > 0) {
+			this.restaurant.menu = fileInput.files[0];
 		}
 	}
 
 	addRestaurant() {
 		console.log(this.restaurant);
 
-		if (!this.restaurant.logo || this.restaurant.subkitchens.length === 0) {
-			const msg = !this.restaurant.logo ? 'Logo is missing' : 'At least one kitchen is required';
+		const errors: string[] = [];
+		if (!this.restaurant.logo) {
+			errors.push('Logo');
+		}
+		if (!this.restaurant.menu) {
+			errors.push('Menu');
+		}
+		if (this.restaurant.subkitchens.length === 0) {
+			errors.push('Subkitchens')
+		}
+		if (errors.length > 0) {
+			const msg = `Missing required information: ${errors.join(', ')}`;
 			const error = new Error(msg);
 			this.handleError(error);
 			return;
 		}
 
 		const subkitchens = this.restaurant.subkitchens.map((subkitchen) => subkitchen.id);
-		this.restaurantService.addCustomRestaurant(this.restaurant.name, this.restaurant.city, this.restaurant.street, subkitchens, this.restaurant.delivery, this.restaurant.pickup, this.restaurant.logo).subscribe({
+		this.restaurantService.addCustomRestaurant(this.restaurant.name, this.restaurant.city, this.restaurant.street, subkitchens, this.restaurant.delivery, this.restaurant.pickup, this.restaurant.logo!, this.restaurant.menu!).subscribe({
 			next: (response) => {
 				console.log(response);
 			},

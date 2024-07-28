@@ -53,6 +53,7 @@ export interface ETA {
 export interface CustomRestaurant extends Restaurant {
 	delivery: boolean;
 	pickup: boolean;
+	menuurl: string;
 }
 
 export interface LieferandoRestaurant extends Restaurant {

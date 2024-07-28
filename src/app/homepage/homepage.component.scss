@@ -87,170 +87,173 @@ mat-expansion-panel {
 	user-select: none;
 }
 
-ul {
-	padding: unset;
-}
-
-li {
-	position: relative;
-	padding-top: 10px;
-	padding-bottom: 10px;
-	height: 100% !important;
-	background-color: var(--foreground-color);
-	margin-bottom: 10px;
-	border-radius: 10px;
-	overflow: visible;
-	clip-path: rect(0 0 200% 200%);
-
-	// don't decrease opacity when hovering over list item
-	--mdc-list-list-item-hover-state-layer-opacity: 1;
-
-	&.new::before {
-		content: 'NEW';
-		position: absolute;
-		transform: translate(-50%, -50%) rotate(-45deg);
-		background-color: green;
-		width: 100%;
-		text-align: center;
-		top: 30px;
-		left: 30px;
+.drawer-content {
+	ul {
+		padding: unset;
 	}
 
-	.restaurant {
-		display: flex;
-		flex-direction: row;
-		align-items: center;
-		padding: 5px 15px;
-		font-size: 11pt;
+	li {
+		position: relative;
+		padding-top: 10px;
+		padding-bottom: 10px;
+		height: 100% !important;
+		background-color: var(--foreground-color);
+		margin-bottom: 10px;
+		border-radius: 10px;
+		overflow: visible;
+		clip-path: polygon(0 0, 100% 0, 200% 200%, 0% 100%);
 
-		.restaurant-logo {
-			border-radius: 10px;
-			height: auto;
-			width: auto;
-			max-width: 120px;
-			object-fit: cover;
-			object-position: center;
-			margin-right: 30px;
+		// don't decrease opacity when hovering over list item
+		--mdc-list-list-item-hover-state-layer-opacity: 1;
+
+		&.new::before {
+			content: 'NEW';
+			position: absolute;
+			transform: translate(-50%, -50%) rotate(-45deg);
+			background-color: green;
+			width: 100%;
+			text-align: center;
+			top: 30px;
+			left: 30px;
 		}
 
-		.restaurant-info-container {
-			margin-right: 30px;
+		.restaurant {
+			display: flex;
+			flex-direction: row;
+			align-items: center;
+			padding: 5px 15px;
+			font-size: 11pt;
+			cursor: pointer;
 
-			.restaurant-name {
-				font-weight: 500;
-				font-size: 13pt;
-				margin-bottom: 5px;
+			.restaurant-logo {
+				border-radius: 10px;
+				height: auto;
+				width: auto;
+				max-width: 120px;
+				object-fit: cover;
+				object-position: center;
+				margin-right: 30px;
 			}
 
-			.delivery-methods,
-			.restaurant-row1,
-			.restaurant-row2,
-			.restaurant-row3,
-			.restaurant-row4 {
-				div {
+			.restaurant-info-container {
+				margin-right: 30px;
+
+				.restaurant-name {
+					font-weight: 500;
+					font-size: 13pt;
+					margin-bottom: 5px;
+				}
+
+				.delivery-methods,
+				.restaurant-row1,
+				.restaurant-row2,
+				.restaurant-row3,
+				.restaurant-row4 {
+					div {
+						display: flex;
+						gap: 4px;
+					}
+
+					color: var(--grey-text-color);
+					margin-bottom: 5px;
 					display: flex;
 					gap: 4px;
 				}
 
-				color: var(--grey-text-color);
-				margin-bottom: 5px;
-				display: flex;
-				gap: 4px;
-			}
+				.restaurant-row1 {
+					>mat-icon {
+						color: yellow;
+					}
+				}
 
-			.restaurant-row1 {
-				>mat-icon {
-					color: yellow;
+				.restaurant-row3 {
+					min-height: 24px;
+				}
+
+				.restaurant-row4 {
+					color: #3bdb3b;
+					min-height: 24px;
 				}
 			}
 
-			.restaurant-row3 {
-				min-height: 24px;
-			}
+			.restaurant-vote-container {
+				display: grid;
+				gap: 10px;
+				margin-left: auto;
 
-			.restaurant-row4 {
-				color: #3bdb3b;
-				min-height: 24px;
-			}
-		}
+				.upvotes,
+				.downvotes {
+					grid-column: 1;
+					display: flex;
+					align-items: center;
+				}
 
-		.restaurant-vote-container {
-			display: grid;
-			gap: 10px;
-			margin-left: auto;
+				.upvotes {
+					grid-row: 1;
+				}
 
-			.upvotes,
-			.downvotes {
-				grid-column: 1;
-				display: flex;
-				align-items: center;
-			}
+				.downvotes {
+					grid-row: 3;
+				}
 
-			.upvotes {
-				grid-row: 1;
-			}
+				.restaurant-upvote-button {
+					grid-row: 1;
+				}
 
-			.downvotes {
-				grid-row: 3;
-			}
+				.restaurant-downvote-button {
+					grid-row: 3;
+				}
 
-			.restaurant-upvote-button {
-				grid-row: 1;
-			}
-
-			.restaurant-downvote-button {
-				grid-row: 3;
-			}
-
-			.restaurant-upvote-button,
-			.restaurant-downvote-button {
-				grid-column: 2;
-				position: relative;
-				width: 45px;
-				height: 45px;
-				display: flex;
-				align-items: center;
-				justify-content: center;
-				font-size: 20pt;
-				background-color: inherit;
-				border-color: transparent;
-				border-radius: 50%;
-				color: inherit;
-				cursor: pointer;
-				transition-duration: 0.4s;
-
-				>mat-icon {
-					font-weight: inherit;
-					font-size: inherit;
+				.restaurant-upvote-button,
+				.restaurant-downvote-button {
+					grid-column: 2;
+					position: relative;
+					width: 45px;
+					height: 45px;
 					display: flex;
 					align-items: center;
 					justify-content: center;
-				}
-
-				&:hover {
-					background-color: #2c272b;
-					transition: background-color 0.1s;
+					font-size: 20pt;
+					background-color: inherit;
+					border-color: transparent;
 					border-radius: 50%;
+					color: inherit;
+					cursor: pointer;
+					transition-duration: 0.4s;
+
+					>mat-icon {
+						font-weight: inherit;
+						font-size: inherit;
+						display: flex;
+						align-items: center;
+						justify-content: center;
+					}
+
+					&:hover {
+						background-color: #2c272b;
+						transition: background-color 0.1s;
+						border-radius: 50%;
+					}
+
+					&:active,
+					&.active {
+						background-color: #342f32;
+						border-radius: 50%;
+						transition: background-color cubic-bezier(0.68, -0.55, 0.265, 1.55);
+					}
+
+					&.active {
+						font-weight: 900;
+						text-shadow: 0 0 5px #fff;
+					}
 				}
 
-				&:active,
-				&.active {
-					background-color: #342f32;
-					border-radius: 50%;
-					transition: background-color cubic-bezier(0.68, -0.55, 0.265, 1.55);
+				.restaurant-votes {
+					grid-row: 2;
+					grid-column: 2;
+					text-align: center;
+					font-size: 16pt;
 				}
-
-				&.active {
-					font-weight: 900;
-					text-shadow: 0 0 5px #fff;
-				}
-			}
-
-			.restaurant-votes {
-				grid-row: 2;
-				grid-column: 2;
-				text-align: center;
-				font-size: 16pt;
 			}
 		}
 	}

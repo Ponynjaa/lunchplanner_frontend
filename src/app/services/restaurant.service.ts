@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { firstValueFrom, Observable } from 'rxjs';
 import { CustomRestaurant, Kitchen, LieferandoRestaurant, Restaurant } from '../models/restaurant';
 
 @Injectable({
@@ -37,9 +37,10 @@ export class RestaurantService {
 	getAllCustomRestaurants(): Observable<Array<CustomRestaurant>> {
 		return this.http.get<Array<CustomRestaurant>>(`${this.backendUrl}/restaurant/getAllCustomRestaurants`);
 	}
-	addCustomRestaurant(name: string, city: string, street: string, subkitchensIds: number[], delivery: boolean, pickup: boolean, logo: Blob) {
+	addCustomRestaurant(name: string, city: string, street: string, subkitchensIds: number[], delivery: boolean, pickup: boolean, logo: Blob, menu: Blob) {
 		const formData = new FormData();
 		formData.append('image', logo);
+		formData.append('menu', menu);
 		formData.append('name', name);
 		formData.append('city', city);
 		formData.append('street', street);
@@ -49,13 +50,13 @@ export class RestaurantService {
 
 		return this.http.post(`${this.backendUrl}/restaurant/addCustomRestaurant`, formData);
 	}
-	getCustomRestaurantDetails(id: number): Observable<CustomRestaurant> {
+	getCustomRestaurantDetails(id: string) {
 		return this.http.get<CustomRestaurant>(`${this.backendUrl}/restaurant/getCustomRestaurantDetails?id=${id}`);
 	}
-	getAllLieferandoRestaurants(place: 'deg'|'muc'): Observable<Array<LieferandoRestaurant>> {
+	getAllLieferandoRestaurants(place: 'deg'|'muc') {
 		return this.http.get<Array<LieferandoRestaurant>>(`${this.backendUrl}/restaurant/getAllLieferandoRestaurants?postalCode=${this.coords[place].postalCode}&latitude=${this.coords[place].latitude}&longitude=${this.coords[place].longitude}`);
 	}
-	getAllKitchens(): Observable<Array<Kitchen>> {
+	getAllKitchens() {
 		return this.http.get<Array<Kitchen>>(`${this.backendUrl}/restaurant/getAllKitchens`);
 	}
 }

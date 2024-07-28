@@ -1,0 +1,19 @@
+<div class="restaurant-details-container">
+	<app-header></app-header>
+
+	<div class="content-container">
+		<img [src]="restaurant?.logourl" class="restaurant-logo">
+		<div class="restaurant-name">
+			{{ restaurant?.name }}
+		</div>
+		<div class="pdf-viewer">
+			@if (pdf) {
+				<object [data]="pdf" type="application/pdf" width="100%" height="100%">
+					<p>
+						It appears you don't have a PDF plugin for this browser. But don't worry, you can <a [href]="pdf">click here to download the PDF file.</a>
+					</p>
+				</object>
+			}
+		</div>
+	</div>
+</div>

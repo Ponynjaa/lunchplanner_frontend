@@ -12,7 +12,14 @@ import { Vote } from '../models/restaurant';
 	styleUrl: './votes.component.scss'
 })
 export class VotesComponent {
-	@Input({required: true}) votes!: Vote[];
+	@Input({ required: true }) votes!: Vote[];
 
 	protected voteListOverlayOpen = false;
+
+	public onVoteUserClick(event: Event) {
+		// stop propagation so restaurant's detail page won't be opened
+		event.stopPropagation();
+
+		this.voteListOverlayOpen = !this.voteListOverlayOpen;
+	}
 }

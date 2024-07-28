@@ -14,11 +14,12 @@ import { WebSocketService } from '../services/websocket.service';
 import { KeycloakOperationService } from '../services/keycloak.service';
 import { UserProfile } from '../models/user';
 import { VotesComponent } from '../votes/votes.component';
+import { RouterModule } from '@angular/router';
 
 @Component({
 	selector: 'app-homepage',
 	standalone: true,
-	imports: [MatSnackBarModule, CommonModule, FormsModule, MatIconModule, MatCheckboxModule, MatExpansionModule, HeaderComponent, GroupByPipe, MatTooltipModule, VotesComponent],
+	imports: [RouterModule, MatSnackBarModule, CommonModule, FormsModule, MatIconModule, MatCheckboxModule, MatExpansionModule, HeaderComponent, GroupByPipe, MatTooltipModule, VotesComponent],
 	templateUrl: './homepage.component.html',
 	styleUrl: './homepage.component.scss'
 })
@@ -249,7 +250,10 @@ export class HomepageComponent implements OnInit {
 		}).format(number);
 	}
 
-	async upvote(restaurant: Restaurant, lieferando: boolean) {
+	async upvote(event: Event, restaurant: Restaurant, lieferando: boolean) {
+		// stop propagation so restaurant's detail page won't be opened
+		event.stopPropagation();
+
 		// if user already upvoted remove vote
 		if (this.isActive(restaurant.upvotes)) {
 			this.removeVote(restaurant.id);
@@ -266,7 +270,10 @@ export class HomepageComponent implements OnInit {
 		});
 	}
 
-	async downvote(restaurant: Restaurant, lieferando: boolean) {
+	async downvote(event: Event, restaurant: Restaurant, lieferando: boolean) {
+		// stop propagation so restaurant's detail page won't be opened
+		event.stopPropagation();
+
 		// if user already downvoted remove vote
 		if (this.isActive(restaurant.downvotes)) {
 			this.removeVote(restaurant.id);
