@@ -5,7 +5,7 @@
 	gap: 1rem;
 	position: relative;
 	z-index: 100;
-	border-bottom: 1px solid var(--border-color);
+	box-shadow: 0 10px 5px -5px rgba(0, 0, 0, 0.3);
 
 	.logo {
 		height: 70px;

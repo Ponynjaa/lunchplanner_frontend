@@ -36,6 +36,24 @@ export class CustomRestaurantDetailsComponent implements OnInit, OnDestroy {
 		});
 	}
 
+	getDeliveryMethods(restaurant: CustomRestaurant) {
+		if (!restaurant) {
+			return '';
+		}
+
+		const delivery = restaurant.delivery;
+		const pickup = restaurant.pickup;
+		if (delivery && pickup) {
+			return 'Lieferung & Abholung';
+		} else if (delivery) {
+			return 'Nur Lieferung';
+		} else if (pickup) {
+			return 'Nur Abholung';
+		}
+
+		return 'Geschlossen';
+	}
+
 	ngOnDestroy() {
 		this.sub.unsubscribe();
 	}

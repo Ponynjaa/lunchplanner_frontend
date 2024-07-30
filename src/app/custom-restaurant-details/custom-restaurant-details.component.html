@@ -1,19 +1,30 @@
 <div class="restaurant-details-container">
 	<app-header></app-header>
-
 	<div class="content-container">
-		<img [src]="restaurant?.logourl" class="restaurant-logo">
-		<div class="restaurant-name">
-			{{ restaurant?.name }}
+		<div class="drawer-container">
+			<div class="restaurant-header">
+				<img [src]="restaurant?.logourl" class="restaurant-logo">
+				<div class="restaurant-infos">
+					<div>{{ restaurant?.name }}</div>
+					<div>{{ restaurant?.street }}</div>
+					<div>{{ restaurant?.city }}</div>
+					<div>{{ getDeliveryMethods(restaurant) }}</div>
+				</div>
+			</div>
+			<div class="pdf-viewer">
+				@if (pdf) {
+					<object [data]="pdf" type="application/pdf" width="100%" height="100%">
+						<p>
+							It appears you don't have a PDF plugin for this browser. But don't worry, you can <a
+								[href]="pdf">click here to download the PDF file.</a>
+						</p>
+					</object>
+				}
+			</div>
 		</div>
-		<div class="pdf-viewer">
-			@if (pdf) {
-				<object [data]="pdf" type="application/pdf" width="100%" height="100%">
-					<p>
-						It appears you don't have a PDF plugin for this browser. But don't worry, you can <a [href]="pdf">click here to download the PDF file.</a>
-					</p>
-				</object>
-			}
+
+		<div class="basket-container">
+			<div>Bestellungen</div>
 		</div>
 	</div>
 </div>
