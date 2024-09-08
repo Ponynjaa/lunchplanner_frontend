@@ -1,0 +1,17 @@
+.address-landingpage-container {
+	display: flex;
+	flex-direction: column;
+	height: 100vh;
+}
+
+.main-content {
+	position: relative;
+	top: 20%;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+}
+
+address-picker {
+	width: 60%;
+}

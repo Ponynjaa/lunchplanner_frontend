@@ -13,7 +13,7 @@ import { DomSanitizer } from '@angular/platform-browser';
 	styleUrl: './custom-restaurant-details.component.scss'
 })
 export class CustomRestaurantDetailsComponent implements OnInit, OnDestroy {
-	restaurant!: CustomRestaurant;
+	restaurant?: CustomRestaurant;
 	pdf!: any;
 	private sub: any;
 
@@ -28,15 +28,23 @@ export class CustomRestaurantDetailsComponent implements OnInit, OnDestroy {
 
 	getRestaurantDetails(id: string) {
 		this.restaurantService.getCustomRestaurantDetails(id).subscribe({
-			next: (restaurant) => {
+			next: async (restaurant) => {
 				this.restaurant = restaurant;
-				this.pdf = this.sanitizer.bypassSecurityTrustResourceUrl(restaurant.menuurl);
-				console.log(restaurant);
+				await this.getPdf(this.restaurant.id);
 			}
 		});
 	}
 
-	getDeliveryMethods(restaurant: CustomRestaurant) {
+	async getPdf(id: string) {
+		// this.pdf = this.sanitizer.bypassSecurityTrustResourceUrl(this.restaurant.menu);
+		this.restaurantService.getCustomRestaurantPdf(id).subscribe({
+			next: (pdf) => {
+				this.pdf = this.sanitizer.bypassSecurityTrustResourceUrl(URL.createObjectURL(pdf));
+			}
+		});
+	}
+
+	getDeliveryMethods(restaurant?: CustomRestaurant) {
 		if (!restaurant) {
 			return '';
 		}

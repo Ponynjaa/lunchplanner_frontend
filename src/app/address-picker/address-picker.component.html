@@ -1,0 +1,33 @@
+<div class="address-picker-container">
+	<div class="search-container" cdkOverlayOrigin #triggerSuggestionsOverlay="cdkOverlayOrigin">
+		<mat-icon fontIcon="search"></mat-icon>
+		<input #searchInput type="text" placeholder="Enter address..." (keyup)="search(getValue($event))" (click)="onSearchBarClick()"/>
+	</div>
+	<mat-form-field class="country-container" subscriptSizing="dynamic">
+		<mat-label>Country</mat-label>
+		<mat-select [(value)]="countryCode">
+			@for (country of countries; track country) {
+				<mat-option [value]="country.code">{{ country.name }}</mat-option>
+			}
+		</mat-select>
+	</mat-form-field>
+</div>
+
+<ng-template
+	cdkConnectedOverlay
+	[cdkConnectedOverlayOrigin]="triggerSuggestionsOverlay"
+	[cdkConnectedOverlayOpen]="suggestionsOverlayOpen"
+	(overlayOutsideClick)="suggestionsOverlayOpen = false">
+	<div class="suggestions">
+		@for (suggestion of suggestions; track suggestion.id) {
+			<div mat-list-item class="suggestion" (click)="pickAddress(suggestion)">
+				<mat-icon fontIcon="location_on"></mat-icon><span>{{ suggestion.full_address }}</span>
+			</div>
+		}
+		@empty {
+			<div class="invalid">
+				<mat-icon fontIcon="warning"></mat-icon><span>Enter a valid address</span>
+			</div>
+		}
+	</div>
+</ng-template>

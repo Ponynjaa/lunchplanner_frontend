@@ -5,8 +5,7 @@
 		<div class="drawer">
 			<div class="search-container">
 				<mat-icon fontIcon="search"></mat-icon>
-				<input type="text" [(ngModel)]="searchText" placeholder="Search restaurants..."
-				(keyup)="onSearchChange($event)" />
+				<input type="text" [(ngModel)]="searchText" placeholder="Search restaurants..." (keyup)="onSearchChange($event)" />
 			</div>
 			<div class="kitchens">
 				<mat-accordion multi>
@@ -44,7 +43,7 @@
 				@for (restaurant of filteredCustomRestaurants; track restaurant) {
 					<li>
 						<div class="restaurant" id="{{ restaurant.id }}" [routerLink]="['/custom-restaurant-details', restaurant.id]">
-							<img class="restaurant-logo" [src]="restaurant.logourl" alt="{{ restaurant.name }}">
+							<img class="restaurant-logo" [src]="restaurant.logo" alt="{{ restaurant.name }}">
 							<div class="restaurant-info-container">
 								<h3 class="restaurant-name">{{ restaurant.name }}</h3>
 								<p class="delivery-methods">{{ getDeliveryMethods(restaurant) }}</p>
@@ -53,10 +52,10 @@
 							</div>
 							<div class="restaurant-vote-container">
 								<votes [votes]="restaurant.upvotes" class="upvotes"></votes>
-								<button class="restaurant-upvote-button" [class.active]="isActive(restaurant.upvotes)" (click)="upvote($event, restaurant, false)"><mat-icon>keyboard_arrow_up</mat-icon></button>
+								<button class="restaurant-upvote-button" [class.active]="isActive(restaurant.upvotes)" (click)="upvote($event, restaurant, 'custom')"><mat-icon>keyboard_arrow_up</mat-icon></button>
 								<div class="restaurant-votes">{{ restaurant.votes ?? 0 }}</div>
 								<votes [votes]="restaurant.downvotes" class="downvotes"></votes>
-								<button class="restaurant-downvote-button" [class.active]="isActive(restaurant.downvotes)" (click)="downvote($event, restaurant, false)"><mat-icon>keyboard_arrow_down</mat-icon></button>
+								<button class="restaurant-downvote-button" [class.active]="isActive(restaurant.downvotes)" (click)="downvote($event, restaurant, 'custom')"><mat-icon>keyboard_arrow_down</mat-icon></button>
 							</div>
 						</div>
 					</li>
@@ -102,10 +101,10 @@
 								</div>
 								<div class="restaurant-vote-container">
 									<votes [votes]="restaurant.upvotes" class="upvotes"></votes>
-									<button class="restaurant-upvote-button" [class.active]="isActive(restaurant.upvotes)" (click)="upvote($event, restaurant, true)"><mat-icon>keyboard_arrow_up</mat-icon></button>
+									<button class="restaurant-upvote-button" [class.active]="isActive(restaurant.upvotes)" (click)="upvote($event, restaurant, 'lieferando')"><mat-icon>keyboard_arrow_up</mat-icon></button>
 									<div class="restaurant-votes">{{ restaurant.votes ?? 0 }}</div>
 									<votes [votes]="restaurant.downvotes" class="downvotes"></votes>
-									<button class="restaurant-downvote-button" [class.active]="isActive(restaurant.downvotes)" (click)="downvote($event, restaurant, true)"><mat-icon>keyboard_arrow_down</mat-icon></button>
+									<button class="restaurant-downvote-button" [class.active]="isActive(restaurant.downvotes)" (click)="downvote($event, restaurant, 'lieferando')"><mat-icon>keyboard_arrow_down</mat-icon></button>
 								</div>
 							</div>
 						</li>

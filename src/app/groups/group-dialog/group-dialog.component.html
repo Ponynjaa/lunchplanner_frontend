@@ -1,0 +1,71 @@
+<h2 mat-dialog-title>Manage groups</h2>
+<button mat-dialog-close class="close" matTooltip="Close"><mat-icon>close</mat-icon></button>
+<mat-dialog-content>
+	<div class="breadcrumb" [class.invisible]="mastergroups.length === 0">
+		<div class="item" (click)="showSubgroups()"><mat-icon>home</mat-icon></div>
+		@for (mastergroup of mastergroups; track mastergroup) {
+			<mat-icon>keyboard_arrow_right</mat-icon>
+			<div class="item" (click)="showSubgroups(mastergroup)">{{ mastergroup.name }}</div>
+		}
+	</div>
+
+	@if (mastergroups.length > 0) {
+		<div class="user-wrapper">
+			<div class="user-list-label">Users in this group:</div>
+			<div class="user-list">
+				@for (user of mastergroups[mastergroups.length - 1].users; track user) {
+					<div class="user">
+						<div class="image">
+							<img [src]="user.image">
+						</div>
+						<span>{{ user.first_name }} {{ user.last_name }}</span>
+						<div class="actions">
+							<button mat-icon-button matTooltip="Remove user from group" (click)="removeUserFromGroup($event, user)"><mat-icon>person_remove</mat-icon></button>
+						</div>
+					</div>
+				}
+				<div class="user invite-link-container">
+					<div class="invite-link" [class.invisible]="!inviteLink">
+						<input type="text" class="invite-link-input" readonly value="{{ inviteLink }}" (focus)="onInviteInputFocus($event)">
+						<button mat-icon-button matTooltip="Copy link" (click)="copyLink()"><mat-icon>content_copy</mat-icon></button>
+					</div>
+					<button mat-stroked-button (click)="generateInviteLink()" [class.invisible]="inviteLink">Generate invite link</button>
+				</div>
+			</div>
+		</div>
+	}
+
+	<div class="group-wrapper">
+		@if (mastergroups.length > 0) {
+			<div class="group-list-label">Subgroups in this group:</div>
+		}
+		<div class="group-list">
+			@for (group of currentGroups; track group) {
+				<div class="group" (click)="showSubgroups(group)">
+					<div class="image" (click)="editImage($event, group)">
+						<img [src]="group.image">
+						<mat-icon>edit</mat-icon>
+					</div>
+					<span>{{ group.name }}</span>
+					<div class="actions">
+						<button mat-icon-button matTooltip="Delete group" (click)="deleteGroup($event, group)"><mat-icon>delete</mat-icon></button>
+					</div>
+				</div>
+			}
+			@empty {
+				<div class="no-group">
+					<span>No groups found.</span>
+					<span>You can create a new group using the form below.</span>
+				</div>
+			}
+			<div class="group add-group">
+				<div class="image-upload">
+					<input id="newGroupImage" type="file" accept="image/*" (change)="onFileSelected($event)">
+					<label for="newGroupImage" #newGroupImageLabel></label>
+				</div>
+				<input id="newGroupName" [(ngModel)]="newGroupName" type="text" placeholder="Name">
+				<button mat-stroked-button (click)="createGroup()">Create new group</button>
+			</div>
+		</div>
+	</div>
+</mat-dialog-content>

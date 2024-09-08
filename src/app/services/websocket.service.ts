@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
-import { WebSocketSubject, webSocket } from 'rxjs/webSocket';
+import { Observable } from 'rxjs';
+import { webSocket, WebSocketSubject } from 'rxjs/webSocket';
 
 @Injectable({
 	providedIn: 'root',
@@ -7,9 +8,22 @@ import { WebSocketSubject, webSocket } from 'rxjs/webSocket';
 export class WebSocketService {
 	private readonly backendUrl = 'localhost:3000';
 
+	sub?: Observable<any>;
+	subject?: WebSocketSubject<any>;
+
 	constructor() { }
 
-	connect(token: string): WebSocketSubject<any> {
-		return webSocket(`ws://${this.backendUrl}?token=${token}`);
+	connect(sessionId: number, token: string): Observable<any> {
+		this.subject = webSocket(`ws://${this.backendUrl}?token=${token}`);
+		this.sub = this.subject.multiplex(
+			() => ({ subscribe: sessionId }),
+			() => ({ unsubscribe: sessionId }),
+			(message: any) => message.sessionId === sessionId
+		);
+		return this.sub;
+	}
+
+	sendMessage(msg: any) {
+		this.subject?.next(msg);
 	}
 }

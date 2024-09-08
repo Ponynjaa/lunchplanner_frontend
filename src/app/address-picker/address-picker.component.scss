@@ -1,0 +1,67 @@
+.address-picker-container {
+	display: flex;
+	gap: 5px;
+
+	> .search-container {
+		display: flex;
+		flex-grow: 1;
+		flex-direction: row;
+		align-items: center;
+		gap: 10px;
+		border: 1px solid var(--border-color);
+		border-radius: 5px;
+		padding: 10px;
+		box-sizing: border-box;
+	
+		input {
+			width: 100%;
+			padding: 5px;
+			font-size: 16px;
+			border: none;
+			background-color: inherit;
+			color: inherit;
+			font-family: inherit;
+			letter-spacing: inherit;
+			font-weight: inherit;
+	
+			&:active,
+			&:focus,
+			&:focus-visible {
+				outline: none;
+			}
+		}
+	}
+
+	> .country-container {
+		--mdc-filled-text-field-container-color: transparent;
+		border: 1px solid var(--border-color);
+	}
+}
+
+.suggestions {
+	background-color: var(--foreground-color);
+	border-radius: 10px;
+	border: 1px solid var(--border-color);
+	padding: 10px;
+
+	> .suggestion,
+	> .invalid {
+		display: flex;
+		align-items: center;
+		gap: 10px;
+	}
+
+	> .suggestion {
+		padding: 10px;
+	}
+}
+
+.suggestion:hover,
+.search-container:hover,
+.country-container:hover {
+	background-color: var(--highlight-color);
+}
+
+.suggestion:hover {
+	cursor: pointer;
+}

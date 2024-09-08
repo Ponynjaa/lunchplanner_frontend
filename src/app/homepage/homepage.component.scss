@@ -27,6 +27,9 @@ app-header {
 		border: none;
 		background-color: inherit;
 		color: inherit;
+		font-family: inherit;
+		letter-spacing: inherit;
+		font-weight: inherit;
 
 		&:active,
 		&:focus,
@@ -151,12 +154,14 @@ mat-expansion-panel {
 				.restaurant-row4 {
 					div {
 						display: flex;
+						align-items: center;
 						gap: 4px;
 					}
 
 					color: var(--grey-text-color);
 					margin-bottom: 5px;
 					display: flex;
+					align-items: center;
 					gap: 4px;
 				}
 

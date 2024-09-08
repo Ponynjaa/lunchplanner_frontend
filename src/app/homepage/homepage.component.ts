@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { RestaurantService } from '../services/restaurant.service';
-import { CustomRestaurant, DeliveryCosts, DeliveryMethods, Kitchen, LieferandoRestaurant, Restaurant, SubKitchen } from '../models/restaurant';
+import { CustomRestaurant, DeliveryCosts, DeliveryMethods, Kitchen, LieferandoRestaurant, Restaurant, RestaurantType, SubKitchen } from '../models/restaurant';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
@@ -15,6 +15,7 @@ import { KeycloakOperationService } from '../services/keycloak.service';
 import { UserProfile } from '../models/user';
 import { VotesComponent } from '../votes/votes.component';
 import { RouterModule } from '@angular/router';
+import { ImageService } from '../services/image.service';
 
 @Component({
 	selector: 'app-homepage',
@@ -24,6 +25,8 @@ import { RouterModule } from '@angular/router';
 	styleUrl: './homepage.component.scss'
 })
 export class HomepageComponent implements OnInit {
+	sessionId?: number;
+
 	protected customRestaurants: CustomRestaurant[] = [];
 	protected filteredCustomRestaurants: CustomRestaurant[] = [];
 	protected lieferandoRestaurants: LieferandoRestaurant[] = [];
@@ -33,11 +36,13 @@ export class HomepageComponent implements OnInit {
 	protected kitchens: Kitchen[] = [];
 	protected kitchenFilter: any = {};
 	protected loggedInUser?: UserProfile;
+	protected token?: string;
 
 	constructor(
 		private restaurantService: RestaurantService,
 		private keycloakService: KeycloakOperationService,
 		private webSocketService: WebSocketService,
+		private imageService: ImageService,
 		private snackBar: MatSnackBar
 	) { }
 
@@ -47,17 +52,17 @@ export class HomepageComponent implements OnInit {
 		console.log(this.lieferandoRestaurants);
 		this.getCurrentlyUsedKitchens();
 
-		const token = await this.keycloakService.getToken();
-		this.webSocketService.connect(token).subscribe({
-			next: (value) => {
-				console.log(value);
-				this.updateRestaurantVotes(value);
-			},
-			error: (error) => {
-				console.error(error);
-				this.handleError(error);
-			}
-		});
+		this.token = await this.keycloakService.getToken();
+		// this.webSocketService.connect(1, token).subscribe({
+		// 	next: (value) => {
+		// 		console.log(value);
+		// 		this.updateRestaurantVotes(value);
+		// 	},
+		// 	error: (error) => {
+		// 		console.error(error);
+		// 		this.handleError(error);
+		// 	}
+		// });
 	}
 
 	updateRestaurantVotes(value: any) {
@@ -250,7 +255,7 @@ export class HomepageComponent implements OnInit {
 		}).format(number);
 	}
 
-	async upvote(event: Event, restaurant: Restaurant, lieferando: boolean) {
+	async upvote(event: Event, restaurant: Restaurant, type: RestaurantType) {
 		// stop propagation so restaurant's detail page won't be opened
 		event.stopPropagation();
 
@@ -260,7 +265,7 @@ export class HomepageComponent implements OnInit {
 			return;
 		}
 
-		this.restaurantService.upvote(restaurant.id, restaurant.name, lieferando).subscribe({
+		this.restaurantService.upvote(restaurant.id, restaurant.name, type).subscribe({
 			next: (response) => {
 				this.updateRestaurantVotes(response);
 			},
@@ -270,7 +275,7 @@ export class HomepageComponent implements OnInit {
 		});
 	}
 
-	async downvote(event: Event, restaurant: Restaurant, lieferando: boolean) {
+	async downvote(event: Event, restaurant: Restaurant, type: RestaurantType) {
 		// stop propagation so restaurant's detail page won't be opened
 		event.stopPropagation();
 
@@ -280,7 +285,7 @@ export class HomepageComponent implements OnInit {
 			return;
 		}
 
-		this.restaurantService.downvote(restaurant.id, restaurant.name, lieferando).subscribe({
+		this.restaurantService.downvote(restaurant.id, restaurant.name, type).subscribe({
 			next: (response) => {
 				this.updateRestaurantVotes(response);
 			},
@@ -304,7 +309,7 @@ export class HomepageComponent implements OnInit {
 	sortRestaurants() {
 		this.filteredCustomRestaurants = [...this.filteredCustomRestaurants].sort((a, b) => {
 			const aVotes = a.votes ?? 0;
-			const bVotes  = b.votes ?? 0;
+			const bVotes = b.votes ?? 0;
 			if (aVotes > bVotes) return -1;
 			if (aVotes < bVotes) return 1;
 
@@ -440,7 +445,8 @@ export class HomepageComponent implements OnInit {
 			this.restaurantService.getAllCustomRestaurants().subscribe({
 				next: (restaurants: CustomRestaurant[]) => {
 					this.customRestaurants = restaurants;
-					this.filteredCustomRestaurants = Object.assign([], restaurants);
+					this.setImageDataUrl(this.customRestaurants);
+					this.filteredCustomRestaurants = Object.assign([], this.customRestaurants);
 					resolve(restaurants);
 				},
 				error: (error: any) => {
@@ -451,7 +457,7 @@ export class HomepageComponent implements OnInit {
 		});
 
 		const lieferandoRestaurantsPromise = new Promise((resolve, reject) => {
-			this.restaurantService.getAllLieferandoRestaurants('deg').subscribe({
+			this.restaurantService.getAllLieferandoRestaurants().subscribe({
 				next: (restaurants: LieferandoRestaurant[]) => {
 					this.lieferandoRestaurants = restaurants;
 					this.filteredLieferandoRestaurants = Object.assign([], restaurants);
@@ -468,8 +474,15 @@ export class HomepageComponent implements OnInit {
 		this.updateFilteredRestaurants();
 	}
 
+	setImageDataUrl(restaurants: CustomRestaurant[]) {
+		// for (const restaurant of restaurants) {
+		// 	console.log(restaurant);
+		// 	restaurant.logourl = `${base64}`;
+		// }
+	}
+
 	private handleError(error: any) {
-		this.displayError(error.code + ' ' + error.reason + '. ' + error.message);
+		this.displayError(error);
 	}
 
 	private displayError(message: string) {

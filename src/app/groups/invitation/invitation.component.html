@@ -1,0 +1,15 @@
+<div class="wrapper">
+	@if (invitationInfos) {
+		<img [src]="invitationInfos.image">
+		<span class="description">You've been invited to join</span>
+		<span class="name">{{ invitationInfos.name }}</span>
+		<button mat-flat-button class="accept_invite" (click)="joinGroup()">Accept invite</button>
+	} @else if (loading) {
+		<mat-spinner></mat-spinner>
+	} @else {
+		<img src="/assets/error.svg">
+		<span class="invalid-title">Invite invalid</span>
+		<span class="description">This invite is expired</span>
+		<button mat-flat-button routerLink="/">Continue to Homepage</button>
+	}
+</div>

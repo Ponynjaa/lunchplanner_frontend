@@ -43,9 +43,8 @@ export class UserProfileDialogComponent {
 	get userImageLabel(): ElementRef<HTMLLabelElement> {
 		return this._userImageLabel;
 	}
-	
+
 	selectedFile?: File;
-	language: string = 'de-DE';
 	imageUrl: string = '';
 
 	constructor(

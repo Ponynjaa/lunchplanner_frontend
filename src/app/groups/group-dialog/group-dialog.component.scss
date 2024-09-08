@@ -1,0 +1,190 @@
+[mat-dialog-title] {
+	margin-bottom: 0;
+}
+
+mat-dialog-content {
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
+}
+
+.close {
+	display: flex;
+	position: absolute;
+	right: 5px;
+	top: 5px;
+	padding: 5px;
+	background-color: transparent;
+	border: none;
+	outline: none;
+	color: red;
+	border-radius: 50%;
+
+	&:hover {
+		background-color: var(--highlight-color);
+		cursor: pointer;
+	}
+}
+
+.invisible {
+	display: none !important;
+}
+
+.breadcrumb {
+	display: flex;
+	flex-direction: row;
+	justify-content: start;
+	align-items: center;
+
+	.item {
+		display: flex;
+		border-radius: 5px;
+		padding: 5px;
+
+		&:hover {
+			background-color: var(--highlight-color);
+			cursor: pointer;
+		}
+	}
+}
+
+.group-list,
+.user-list {
+	background-color: var(--foreground-color);
+	border-radius: 5px;
+}
+
+.image {
+	position: relative;
+	box-sizing: border-box;
+	height: var(--mdc-outlined-button-container-height, 36px);
+	width: var(--mdc-outlined-button-container-height, 36px);
+	cursor: pointer;
+
+	img {
+		height: inherit;
+		width: inherit;
+		border-radius: 50%;
+		border: 1px solid var(--border-color);
+	}
+}
+
+.user,
+.group {
+	display: flex;
+	flex-direction: row;
+	justify-content: center;
+	align-items: center;
+	gap: 10px;
+	padding: 10px;
+	height: var(--mdc-outlined-button-container-height, 36px);
+
+	.actions {
+		margin-left: auto;
+	}
+}
+
+.group {
+	&:not(.add-group):hover {
+		background-color: var(--highlight-color);
+		cursor: pointer;
+	}
+
+	.image {
+		mat-icon {
+			display: none;
+			position: absolute;
+			inset: 0;
+			margin: auto;
+			color: white;
+		}
+	
+		&:hover {
+			> mat-icon {
+				display: block;
+			}
+	
+			> img {
+				opacity: .3;
+			}
+		}
+	}
+}
+
+.no-group {
+	display: flex;
+	flex-direction: column;
+	padding: 10px;
+	align-items: center;
+}
+
+.invite-link-container,
+.add-group {
+	border-top: 1px solid var(--border-color);
+	margin-top: 5px;
+}
+
+.invite-link {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 5px;
+}
+
+.add-group #newGroupName,
+.invite-link-input {
+	box-sizing: border-box;
+	background-color: transparent;
+	border: 1px solid var(--border-color);
+	border-radius: 5px;
+	padding: 2px 5px;
+	color: inherit;
+	font-family: inherit;
+	line-height: inherit;
+	font-size: inherit;
+	font-weight: inherit;
+	letter-spacing: inherit;
+	height: var(--mdc-outlined-button-container-height, 36px);
+
+	&:active,
+	&:focus,
+	&:focus-visible {
+		outline: 2px solid var(--highlight-color);
+	}
+}
+
+.invite-link-input {
+	text-overflow: ellipsis;
+}
+
+.image-upload {
+	box-sizing: border-box;
+	display: flex;
+	flex-direction: row;
+	align-items: center;
+
+	// make it invisible but still viewable for screenreaders etc
+	input[type="file"] {
+		opacity: 0;
+		z-index: -1;
+		position: absolute;
+		width: 100px;
+	}
+
+	// display focus of file input on label
+	input[type="file"]:focus + label {
+		outline: 2px solid var(--highlight-color);
+	}
+
+	label {
+		box-sizing: border-box;
+		height: var(--mdc-outlined-button-container-height, 36px);
+		width: var(--mdc-outlined-button-container-height, 36px);
+		background-position: center;
+		background-repeat: no-repeat;
+		background-size: cover;
+		cursor: pointer;
+		border-radius: 50%;
+		border: 1px solid var(--border-color);
+	}
+}

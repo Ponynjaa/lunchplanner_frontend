@@ -6,12 +6,14 @@ import { MatAutocompleteModule } from '@angular/material/autocomplete';
 import { MatInputModule } from '@angular/material/input';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { RestaurantService } from '../services/restaurant.service';
-import { Restaurant, Kitchen, SubKitchen, OrderMethod } from '../models/restaurant';
+import { Kitchen, SubKitchen, OrderMethod } from '../models/restaurant';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { HeaderComponent } from '../header/header.component';
+import { AddressPickerComponent } from '../address-picker/address-picker.component';
+import { Suggestion } from '../models/address';
 
 export const _subkitchenFilter = (opt: SubKitchen[], value: string): SubKitchen[] => {
 	const filterValue = value.toLowerCase();
@@ -23,6 +25,8 @@ interface NewRestaurant {
 	name: string;
 	city: string;
 	street: string;
+	longitude: number;
+	latitude: number;
 	logo: File | null;
 	menu: File | null;
 	delivery: boolean;
@@ -33,7 +37,7 @@ interface NewRestaurant {
 @Component({
 	selector: 'app-add-restaurant',
 	standalone: true,
-	imports: [HeaderComponent, FormsModule, ReactiveFormsModule, MatFormFieldModule, MatInputModule, MatAutocompleteModule, AsyncPipe, MatChipsModule, MatIconModule, MatButtonModule, MatCheckboxModule],
+	imports: [HeaderComponent, AddressPickerComponent, FormsModule, ReactiveFormsModule, MatFormFieldModule, MatInputModule, MatAutocompleteModule, AsyncPipe, MatChipsModule, MatIconModule, MatButtonModule, MatCheckboxModule],
 	templateUrl: './add-restaurant.component.html',
 	styleUrl: './add-restaurant.component.scss'
 })
@@ -68,6 +72,8 @@ export class AddRestaurantComponent implements OnInit {
 		name: '',
 		city: '',
 		street: '',
+		longitude: 0,
+		latitude: 0,
 		menu: null,
 		logo: null,
 		delivery: false,
@@ -90,6 +96,14 @@ export class AddRestaurantComponent implements OnInit {
 		});
 
 		this.registerValueChangeHandler(['name', 'city', 'street', 'pickup', 'delivery']);
+	}
+
+	onAddressSelected(suggestion: Suggestion) {
+		console.log(suggestion);
+		this.restaurant.city = suggestion.place;
+		this.restaurant.street = suggestion.address;
+		this.restaurant.longitude = suggestion.longitude;
+		this.restaurant.latitude = suggestion.latitude;
 	}
 
 	registerValueChangeHandler(keys: Array<keyof NewRestaurant>) {
@@ -141,7 +155,7 @@ export class AddRestaurantComponent implements OnInit {
 		}
 
 		const subkitchens = this.restaurant.subkitchens.map((subkitchen) => subkitchen.id);
-		this.restaurantService.addCustomRestaurant(this.restaurant.name, this.restaurant.city, this.restaurant.street, subkitchens, this.restaurant.delivery, this.restaurant.pickup, this.restaurant.logo!, this.restaurant.menu!).subscribe({
+		this.restaurantService.addCustomRestaurant(this.restaurant.name, this.restaurant.longitude, this.restaurant.latitude, this.restaurant.city, this.restaurant.street, subkitchens, this.restaurant.delivery, this.restaurant.pickup, this.restaurant.logo!, this.restaurant.menu!).subscribe({
 			next: (response) => {
 				console.log(response);
 			},

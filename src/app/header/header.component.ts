@@ -9,6 +9,8 @@ import { MatDialog } from '@angular/material/dialog';
 import { KeycloakProfile } from 'keycloak-js';
 import { UserProfile } from '../models/user';
 import { UserProfileDialogComponent } from '../user-profile-dialog/user-profile-dialog.component';
+import { SessionDialogComponent } from '../session-dialog/session-dialog.component';
+import { GroupDialogComponent } from '../groups/group-dialog/group-dialog.component';
 
 @Component({
 	selector: 'app-header',
@@ -20,16 +22,29 @@ import { UserProfileDialogComponent } from '../user-profile-dialog/user-profile-
 export class HeaderComponent implements OnInit {
 	userProfile?: UserProfile;
 
-	constructor(private keycloakService: KeycloakOperationService, private imageService: ImageService, public dialog: MatDialog) { }
+	constructor(private keycloakService: KeycloakOperationService, private imageService: ImageService, private dialog: MatDialog) { }
 
 	ngOnInit() {
 		this.keycloakService.getUserProfile().then((data: KeycloakProfile) => {
 			this.userProfile = data;
-			this.imageService.getUserImage(this.userProfile.id!).subscribe({
+			this.imageService.getUserImage(this.userProfile.id!, true).subscribe({
 				next: async (value) => {
 					this.userProfile!.userImage = await this.imageService.createImageFromBlob(value);
 				}
 			});
+		});
+	}
+
+	openGroupDialog() {
+		const dialogRef = this.dialog.open(GroupDialogComponent, {
+			data: { userProfile: this.userProfile },
+			panelClass: 'remove-scroll'
+		});
+
+		dialogRef.afterClosed().subscribe(result => {
+			if (result) {
+				console.log('KEVIIIIIIIN', result);
+			}
 		});
 	}
 
@@ -39,7 +54,7 @@ export class HeaderComponent implements OnInit {
 		});
 
 		dialogRef.afterClosed().subscribe(result => {
-			if (result.userImage) {
+			if (result?.userImage) {
 				this.userProfile!.userImage = result.userImage;
 			}
 		});

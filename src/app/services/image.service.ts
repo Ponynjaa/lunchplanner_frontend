@@ -10,8 +10,9 @@ export class ImageService {
 	// private readonly backendUrl = '/api/v1';
 	constructor(private http: HttpClient) { }
 
-	getUserImage(userId: string): Observable<Blob> {
-		return this.http.get(`${this.backendUrl}/getUserImage?userId=${userId}`, { responseType: 'blob' });
+	getUserImage(userId: string, keycloak: boolean = false): Observable<Blob> {
+		const query = keycloak ? `?keycloakId=${userId}` : `?userId=${userId}`;
+		return this.http.get(`${this.backendUrl}/getUserImage${query}`, { responseType: 'blob' });
 	}
 
 	createImageFromBlob(image: Blob): Promise<string> {

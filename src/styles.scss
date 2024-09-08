@@ -1,48 +1,30 @@
 /* You can add global styles to this file, and also import other style files */
-@font-face {
-	font-family: 'gg sans';
-	font-style: normal;
-	font-weight: normal;
-	src: url('./assets/fonts/gg\ sans\ Regular.woff') format('woff');
-}
-
-@font-face {
-	font-family: 'gg sans';
-	font-style: normal;
-	font-weight: 500;
-	src: url('./assets/fonts/gg\ sans\ Medium.woff') format('woff');
-}
-
-@font-face {
-	font-family: 'gg sans';
-	font-style: normal;
-	font-weight: 600;
-	src: url('./assets/fonts/gg\ sans\ Semibold.woff') format('woff');
-}
-
-@font-face {
-	font-family: 'gg sans';
-	font-style: normal;
-	font-weight: bold;
-	src: url('./assets/fonts/gg\ sans\ Bold.woff') format('woff');
-}
-
 :root {
 	--border-color: #2d2626;
 	--foreground-color: #181a1b;
+	--background-color: #101112;
+	--highlight-color: #373434;
 	--grey-text-color: #a29a8e;
+	--secondary-color: #c2185b;
+	--mdc-circular-progress-active-indicator-color: var(--secondary-color);
+	--mdc-filled-text-field-container-color: #181a1b;
+	--mdc-dialog-container-color: var(--background-color);
+	--mdc-outlined-button-outline-color: var(--border-color);
 }
 
 html {
-	background-color: #101112;
+	background-color: var(--background-color);
 	color: #e8e6e3;
-	font-family: 'gg sans';
 }
 
 html,
 body {
 	height: 100%;
 	margin: 0;
+}
+
+.remove-scroll .mat-mdc-dialog-surface {
+	overflow: unset;
 }
 
 .mat-mdc-snack-bar-container {

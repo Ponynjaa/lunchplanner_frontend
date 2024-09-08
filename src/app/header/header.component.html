@@ -1,16 +1,25 @@
 <div class="header">
-	<img class="logo" src="../../assets/lunchplanner_logo.png" alt="Logo" routerLink="/"/>
-
-	<button mat-button routerLink="/add-restaurant">
-		<mat-icon fontIcon="add"></mat-icon>
-		<span>Add restaurant</span>
+	<button mat-icon-button [matMenuTriggerFor]="navMenu" aria-label="Menu button">
+		<mat-icon>menu</mat-icon>
 	</button>
+	<mat-menu #navMenu="matMenu">
+		<button mat-menu-item routerLink="/add-restaurant">
+			<mat-icon>add</mat-icon>
+			<span>Add restaurant</span>
+		</button>
+		<button mat-menu-item (click)="openGroupDialog()">
+			<mat-icon>groups</mat-icon>
+			<span>Manage groups</span>
+		</button>
+	</mat-menu>
+
+	<img class="logo" src="/assets/lunchplanner_logo.png" alt="Logo" routerLink="/"/>
 
 	<button mat-button [matMenuTriggerFor]="userMenu" class="user-dropdown">
 		<div class="user-container">
 			<img [src]="userProfile?.userImage" alt="UserImage">
 			<span class="user-full-name">{{ userProfile?.firstName }} {{ userProfile?.lastName }}</span>
-			<mat-icon fontIcon="expand_more"></mat-icon>
+			<mat-icon>expand_more</mat-icon>
 		</div>
 	</button>
 	<mat-menu #userMenu="matMenu" xPosition="before">

@@ -1,7 +1,8 @@
+export type RestaurantType = 'lieferando' | 'custom';
+
 export interface Restaurant {
 	id: string;
 	name: string;
-	logourl: string;
 	city: string;
 	street: string;
 	subkitchens: SubKitchen[];
@@ -53,7 +54,8 @@ export interface ETA {
 export interface CustomRestaurant extends Restaurant {
 	delivery: boolean;
 	pickup: boolean;
-	menuurl: string;
+	menu: string;
+	logo: string;
 }
 
 export interface LieferandoRestaurant extends Restaurant {
@@ -66,6 +68,7 @@ export interface LieferandoRestaurant extends Restaurant {
 	eta: ETA;
 	ratingCount: number;
 	rating: string;
+	logourl: string;
 }
 
 export interface Kitchen {

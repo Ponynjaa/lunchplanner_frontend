@@ -17,14 +17,7 @@
 				<mat-label>Name</mat-label>
 				<input type="text" matInput formControlName="name" required>
 			</mat-form-field>
-			<mat-form-field appearance="outline">
-				<mat-label>City</mat-label>
-				<input type="text" matInput formControlName="city" required>
-			</mat-form-field>
-			<mat-form-field appearance="outline">
-				<mat-label>Street</mat-label>
-				<input type="text" matInput formControlName="street" required>
-			</mat-form-field>
+			<address-picker (addressSelected)="onAddressSelected($event)"></address-picker>
 			<mat-form-field appearance="outline">
 				<mat-label>Kitchens</mat-label>
 				<mat-chip-grid #subkitchenChips>
